@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CompoLink – CF-UD 24k details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="logo-wrap">
+      <div class="logo-circle">C</div>
+      <div>
+        <div class="logo-title">CompoLink</div>
+        <div class="logo-subtitle">Smart composite supply overview</div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="index.html" class="nav-item">Home</a>
+      <a href="overview.html" class="nav-item">Material overview</a>
+      <a href="details.html" class="nav-item active">Material details</a>
+      <a href="joint.html" class="nav-item">Joint purchase</a>
+    </nav>
+
+    <button class="cart-button" data-open-cart>
+      Cart <span class="cart-count" data-cart-count>0</span>
+    </button>
+  </header>
+
+  <main class="main">
+    <section class="page-section">
+      <div class="shell">
+        <div class="shell-inner">
+          <header class="shell-header">
+            <div>
+              <h1 class="shell-title">CF-UD 24k / Epoxy 180°C</h1>
+              <p class="shell-subtitle">
+                Material quality &amp; data in one place – example data sheet for the demo.
+              </p>
+            </div>
+            <span class="badge green">Grade A · Stable</span>
+          </header>
+
+          <p class="shell-subtitle">
+            Supplier: EuroComposites · Family: Carbon / UD tape
+          </p>
+
+          <div class="details-grid">
+            <div class="detail-block">
+              <h2 class="detail-title">Material snapshot</h2>
+              <div class="data-list">
+                <div class="data-row">
+                  <span class="data-label">Family</span>
+                  <span class="data-value">Carbon / UD tape</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Tensile strength (0°)</span>
+                  <span class="data-value">2.8 GPa</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Tensile modulus (0°)</span>
+                  <span class="data-value">165 GPa</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Fiber areal weight</span>
+                  <span class="data-value">145 g/m²</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Cure cycle</span>
+                  <span class="data-value">120 min @ 180°C</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Service temp</span>
+                  <span class="data-value">-55°C to +130°C</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Resin system</span>
+                  <span class="data-value">Epoxy, Tg 190°C</span>
+                </div>
+              </div>
+              <div class="material-actions" style="margin-top: 10px;">
+                <button
+                  class="btn btn-ghost"
+                  data-add-to-cart
+                  data-name="CF-UD 24k / Epoxy 180°C"
+                  data-price="33"
+                >
+                  Add this material to cart
+                </button>
+              </div>
+            </div>
+
+            <div class="detail-block">
+              <h2 class="detail-title">Quality control &amp; certification</h2>
+              <div class="data-list">
+                <div class="data-row">
+                  <span class="data-label">Last audit</span>
+                  <span class="data-value">Q3-2025</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Batches on record</span>
+                  <span class="data-value">128</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Certifications</span>
+                  <span class="data-value">
+                    <span class="badge green">AS9100</span>
+                    <span class="badge green">ISO 9001</span>
+                    <span class="badge blue">CoA attached</span>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">Batch reject rate (12m)</span>
+                  <span class="data-value">0.4%</span>
+                </div>
+                <div class="data-row">
+                  <span class="data-label">On-time delivery (OTIF)</span>
+                  <span class="data-value">99.1%</span>
+                </div>
+              </div>
+
+              <div class="material-actions" style="margin-top: 10px;">
+                <a href="downloads.html#tests" target="_blank" class="btn btn-ghost">
+                  View test data
+                </a>
+                <a href="downloads.html#certificates" target="_blank" class="btn btn-primary">
+                  Download certificates
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>CompoLink demo · Project 4.1</span>
+    <span>Built by Ozzy</span>
+  </footer>
+
+  <div class="cart-overlay" data-cart-overlay>
+    <div class="cart-modal">
+      <header class="cart-header">
+        <h2 class="cart-title">Your material selection</h2>
+        <button class="cart-close" data-close-cart>&times;</button>
+      </header>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-footer">
+        <span>Total (demo)</span>
+        <span data-cart-total>€0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

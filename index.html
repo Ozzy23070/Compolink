@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CompoLink – Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page page-home">
+  <header class="site-header">
+    <div class="logo-wrap">
+      <div class="logo-circle">C</div>
+      <div>
+        <div class="logo-title">CompoLink</div>
+        <div class="logo-subtitle">Smart composite supply overview</div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="index.html" class="nav-item active">Home</a>
+      <a href="overview.html" class="nav-item">Material overview</a>
+      <a href="details.html" class="nav-item">Material details</a>
+      <a href="joint.html" class="nav-item">Joint purchase</a>
+    </nav>
+
+    <button class="cart-button" data-open-cart>
+      Cart <span class="cart-count" data-cart-count>0</span>
+    </button>
+  </header>
+
+  <main class="main">
+    <!-- Hero met carbon fiber background -->
+    <section class="hero" style="background-image: url('fibers.jpg');">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span>Welcome to CompoLink</span>
+          <span>Composite supply demo</span>
+        </div>
+        <h1 class="hero-title">Linking composite buyers &amp; suppliers.</h1>
+        <p class="hero-subtitle">
+          Explore certified carbon and glass fiber materials, compare quality and bundle demand across companies.
+          This is a prototype for the Project 4.1 supply chain assignment.
+        </p>
+        <div class="hero-actions">
+          <a href="overview.html" class="btn btn-primary">Start with materials overview</a>
+          <a href="details.html" class="btn btn-ghost">View UD tape demo</a>
+          <a href="joint.html" class="btn btn-link">See joint purchase example →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Drie kaarten om flows te kiezen -->
+    <section class="home-grid">
+      <article class="home-card">
+        <h2 class="home-card-title">1. Browse materials</h2>
+        <p class="home-card-text">
+          Filter suppliers on quality level, certifications, price range and lead time. Add interesting materials to your cart.
+        </p>
+        <a href="overview.html" class="btn btn-primary">Open material overview</a>
+      </article>
+
+      <article class="home-card">
+        <h2 class="home-card-title">2. Inspect UD tape</h2>
+        <p class="home-card-text">
+          Dive into a CF-UD 24k / Epoxy 180°C data sheet with key mechanical properties and quality records.
+        </p>
+        <a href="details.html" class="btn btn-ghost">Open material details</a>
+      </article>
+
+      <article class="home-card">
+        <h2 class="home-card-title">3. Simulate joint purchase</h2>
+        <p class="home-card-text">
+          See how combining orders from multiple companies can unlock a lower price tier for the same material.
+        </p>
+        <a href="joint.html" class="btn btn-ghost">Open joint purchase demo</a>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>CompoLink demo · Project 4.1</span>
+    <span>Built by Ozzy</span>
+  </footer>
+
+  <!-- Cart overlay (voor alle pagina's hetzelfde) -->
+  <div class="cart-overlay" data-cart-overlay>
+    <div class="cart-modal">
+      <header class="cart-header">
+        <h2 class="cart-title">Your material selection</h2>
+        <button class="cart-close" data-close-cart>&times;</button>
+      </header>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-footer">
+        <span>Total (demo)</span>
+        <span data-cart-total>€0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

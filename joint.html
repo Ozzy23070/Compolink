@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CompoLink – Joint purchase demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="logo-wrap">
+      <div class="logo-circle">C</div>
+      <div>
+        <div class="logo-title">CompoLink</div>
+        <div class="logo-subtitle">Smart composite supply overview</div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="index.html" class="nav-item">Home</a>
+      <a href="overview.html" class="nav-item">Material overview</a>
+      <a href="details.html" class="nav-item">Material details</a>
+      <a href="joint.html" class="nav-item active">Joint purchase</a>
+    </nav>
+
+    <button class="cart-button" data-open-cart>
+      Cart <span class="cart-count" data-cart-count>0</span>
+    </button>
+  </header>
+
+  <main class="main">
+    <section class="page-section">
+      <div class="shell">
+        <div class="shell-inner">
+          <header class="shell-header">
+            <div>
+              <h1 class="shell-title">Joint purchase setup</h1>
+              <p class="shell-subtitle">
+                Example of bundling demand across companies to unlock a better price level.
+              </p>
+            </div>
+          </header>
+
+          <div class="data-list">
+            <div class="data-row">
+              <span class="data-label">Selected material</span>
+              <span class="data-value">CF-UD 24k / Epoxy 180°C</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Your minimum order</span>
+              <span class="data-value">300 kg</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Your target order</span>
+              <span class="data-value">800 kg</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Your maximum order</span>
+              <span class="data-value">1,200 kg</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Current individual price</span>
+              <span class="data-value">€38 / kg</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Expected joint purchase price</span>
+              <span class="data-value price-good">€33 / kg</span>
+            </div>
+          </div>
+
+          <h2 class="detail-title" style="margin-top: 14px;">Participating buyers</h2>
+          <div class="table">
+            <div class="table-row table-header">
+              <span>Company</span>
+              <span>Committed qty</span>
+              <span>Status</span>
+            </div>
+            <div class="table-row">
+              <span>AeroStructures NL</span>
+              <span>1,500 kg</span>
+              <span class="badge green">Confirmed</span>
+            </div>
+            <div class="table-row">
+              <span>WindTech EU</span>
+              <span>2,000 kg</span>
+              <span class="badge green">Confirmed</span>
+            </div>
+            <div class="table-row">
+              <span>MarineComposites BV</span>
+              <span>900 kg</span>
+              <span class="badge orange">Pending</span>
+            </div>
+            <div class="table-row highlight">
+              <span>Your company</span>
+              <span>800 kg</span>
+              <span class="badge grey">Draft</span>
+            </div>
+            <div class="table-row">
+              <span>Total joint quantity (target)</span>
+              <span>5,200 kg</span>
+              <span>Tier 3 price unlocked</span>
+            </div>
+          </div>
+
+          <div class="material-actions" style="margin-top: 12px;">
+<button class="btn btn-ghost"
+        onclick="alert('Demo only: in a real app you would invite partner companies here.')">
+  Invite more buyers (demo)
+</button>
+
+<button class="btn btn-primary"
+        onclick="alert('Demo only: this would send a joint RFQ to the supplier.')">
+  Submit joint RFQ (demo)
+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>CompoLink demo · Project 4.1</span>
+    <span>Built by Ozzy</span>
+  </footer>
+
+  <div class="cart-overlay" data-cart-overlay>
+    <div class="cart-modal">
+      <header class="cart-header">
+        <h2 class="cart-title">Your material selection</h2>
+        <button class="cart-close" data-close-cart>&times;</button>
+      </header>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-footer">
+        <span>Total (demo)</span>
+        <span data-cart-total>€0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CompoLink – Material overview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="logo-wrap">
+      <div class="logo-circle">C</div>
+      <div>
+        <div class="logo-title">CompoLink</div>
+        <div class="logo-subtitle">Smart composite supply overview</div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="index.html" class="nav-item">Home</a>
+      <a href="overview.html" class="nav-item active">Material overview</a>
+      <a href="details.html" class="nav-item">Material details</a>
+      <a href="joint.html" class="nav-item">Joint purchase</a>
+    </nav>
+
+    <button class="cart-button" data-open-cart>
+      Cart <span class="cart-count" data-cart-count>0</span>
+    </button>
+  </header>
+
+  <main class="main">
+    <section class="page-section">
+      <div class="shell">
+        <div class="shell-inner">
+<img src="fibers.jpg" alt="Carbon fiber texture" class="banner-image">
+          <header class="shell-header">
+            <div>
+              <h1 class="shell-title">Material overview</h1>
+              <p class="shell-subtitle">
+                Filter composite materials and add interesting options to your cart as a demo.
+              </p>
+            </div>
+          </header>
+
+          <div class="filter-row">
+            <span class="chip active">Carbon fiber</span>
+            <span class="chip">Glass fiber</span>
+            <span class="chip">UD tape</span>
+            <span class="chip">Prepreg</span>
+            <span class="chip">Quality &ge; A</span>
+            <span class="chip">Price &le; €40/kg</span>
+            <span class="chip">Certified suppliers only</span>
+          </div>
+
+          <p class="shell-subtitle">
+            Click <strong>“Add to cart”</strong> to build a selection. Use the <strong>Cart</strong> button in the header to view or remove items.
+          </p>
+
+          <div class="material-grid" data-material-list>
+            <!-- Material 1 -->
+            <article class="material-card">
+              <h2 class="material-name">CF-UD 24k / Epoxy 180°C</h2>
+              <p class="material-meta">Supplier: EuroComposites · Lead time: 4 weeks</p>
+              <p class="material-meta">Price range: €32 – €38 / kg · High stiffness, high fatigue</p>
+
+              <div class="material-tags">
+                <span class="tag-pill">Carbon / UD tape</span>
+                <span class="tag-pill">AS9100</span>
+                <span class="tag-pill">ISO 9001</span>
+              </div>
+
+              <div class="material-actions">
+                <button
+                  class="btn btn-ghost"
+                  data-add-to-cart
+                  data-name="CF-UD 24k / Epoxy 180°C"
+                  data-price="33"
+                >
+                  Add to cart
+                </button>
+                <a href="details.html" class="btn btn-primary" target="_blank">
+                  View UD tape page
+                </a>
+              </div>
+            </article>
+
+            <!-- Material 2 -->
+            <article class="material-card">
+              <h2 class="material-name">GF-Woven 600 / Vinylester</h2>
+              <p class="material-meta">Supplier: NordicFibers · Lead time: 2 weeks</p>
+              <p class="material-meta">Price range: €11 – €15 / kg · Impact resistant</p>
+
+              <div class="material-tags">
+                <span class="tag-pill">Glass fiber</span>
+                <span class="tag-pill">ISO 9001</span>
+                <span class="tag-pill bad">Quality 3.9 / 5</span>
+              </div>
+
+              <div class="material-actions">
+                <button
+                  class="btn btn-ghost"
+                  data-add-to-cart
+                  data-name="GF-Woven 600 / Vinylester"
+                  data-price="12"
+                >
+                  Add to cart
+                </button>
+                <a href="details.html" class="btn btn-primary" target="_blank">
+                  Compare with UD tape
+                </a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>CompoLink demo · Project 4.1</span>
+    <span>Built by Ozzy</span>
+  </footer>
+
+  <div class="cart-overlay" data-cart-overlay>
+    <div class="cart-modal">
+      <header class="cart-header">
+        <h2 class="cart-title">Your material selection</h2>
+        <button class="cart-close" data-close-cart>&times;</button>
+      </header>
+      <div class="cart-items" data-cart-items></div>
+      <div class="cart-footer">
+        <span>Total (demo)</span>
+        <span data-cart-total>€0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
