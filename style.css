@@ -1,435 +1,110 @@
-/* BASIS */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #f9fafb;
-  background: #020617;
-  overflow: hidden;
-}
-
-button {
-  border: none;
-  cursor: pointer;
-  font: inherit;
-}
-
-.hidden {
-  display: none;
-}
-
-/* LOGIN */
-
-.full-screen {
-  position: fixed;
-  inset: 0;
-}
-
-.login-bg {
-  background-image: url("https://images.unsplash.com/photo-1541849546-216549ae2161?auto=format&fit=crop&w=1600&q=80");
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(15,23,42,0.1), rgba(15,23,42,0.9));
-}
-
-.login-card {
-  position: relative;
-  z-index: 1;
-  background: rgba(15,23,42,0.9);
-  padding: 2.4rem 2.6rem;
-  border-radius: 1.5rem;
-  width: 95%;
-  max-width: 420px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.7);
-}
-
-.login-card h1 {
-  font-size: 1.8rem;
-  margin-bottom: 0.8rem;
-}
-
-.login-card p {
-  font-size: 0.9rem;
-  color: #e5e7eb;
-}
-
-.demo-creds {
-  margin: 0.3rem 0 1.4rem;
-  font-size: 0.9rem;
-  color: #a5b4fc;
-}
-
-#login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-#login-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.85rem;
-}
-
-#login-form input {
-  padding: 0.55rem 0.8rem;
-  border-radius: 0.7rem;
-  border: 1px solid #4b5563;
-  background: #020617;
-  color: #e5e7eb;
-}
-
-#login-form input:focus {
-  outline: 1px solid #3b82f6;
-  border-color: #3b82f6;
-}
-
-.btn-primary {
-  margin-top: 0.4rem;
-  padding: 0.65rem 1.2rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg,#3b82f6,#6366f1);
-  color: #fff;
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-.btn-secondary {
-  padding: 0.6rem 1.1rem;
-  border-radius: 999px;
-  background: rgba(15,23,42,0.9);
-  color: #e5e7eb;
-  border: 1px solid rgba(148,163,184,0.8);
-  font-size: 0.9rem;
-}
-
-.btn-secondary:hover {
-  background: rgba(30,64,175,0.8);
-  border-color: rgba(129,140,248,1);
-}
-
-.error-msg {
-  min-height: 1.1rem;
-  font-size: 0.8rem;
-  color: #fca5a5;
-}
-
-/* APP HEADER */
-
-#app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-header {
-  height: 64px;
-  padding: 0 1.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(15,23,42,0.96);
-  border-bottom: 1px solid rgba(148,163,184,0.4);
-  backdrop-filter: blur(16px);
-  position: relative;
-  z-index: 10;
-}
-
-.logo {
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.top-nav {
-  display: flex;
-  gap: 0.6rem;
-}
-
-.nav-btn {
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  background: transparent;
-  color: #e5e7eb;
-  border: 1px solid transparent;
-  font-size: 0.85rem;
-}
-
-.nav-btn.active {
-  background: rgba(59,130,246,0.25);
-  border-color: rgba(59,130,246,0.9);
-}
-
-.nav-btn:hover {
-  background: rgba(148,163,184,0.25);
-}
-
-.user-tag {
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-/* PAGINA'S */
-
-.pages {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-}
-
-.page {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
-
-.page-1 {
-  background-image: url("https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80");
-}
-
-.page-2 {
-  background-image: url("https://images.unsplash.com/photo-1581090464777-f3220bbe1b8e?auto=format&fit=crop&w=1600&q=80");
-}
-
-.page-3 {
-  background-image: url("https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1600&q=80");
-}
-
-.page-4 {
-  background-image: url("https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1600&q=80");
-}
-
-.page-5 {
-  background-image: url("https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1600&q=80");
-}
-
-.page-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top, rgba(15,23,42,0.35), rgba(15,23,42,0.96));
-}
-
-.page-content {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  padding: 3rem 6vw;
-  display: flex;
-  align-items: center;
-}
-
-.card {
-  background: rgba(15,23,42,0.9);
-  padding: 2rem 2.2rem;
-  border-radius: 1.5rem;
-  max-width: 560px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-}
-
-.card.wide {
-  max-width: none;
-  width: 100%;
-}
-
-.card.two-cols {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-  gap: 2rem;
-}
-
-.card h1 {
-  font-size: 2rem;
-  margin-bottom: 0.8rem;
-}
-
-.card h2 {
-  font-size: 1.6rem;
-  margin-bottom: 0.7rem;
-}
-
-.card p {
-  font-size: 0.95rem;
-  color: #e5e7eb;
-  margin-bottom: 1rem;
-}
-
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 0.8rem;
-}
-
-.badges {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-}
-
-.badges li {
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(30,64,175,0.9);
-}
-
-.table-wrapper {
-  margin-top: 0.8rem;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-thead {
-  background: rgba(30,64,175,0.9);
-}
-
-th, td {
-  padding: 0.55rem 0.65rem;
-  text-align: left;
-  border-bottom: 1px solid rgba(55,65,81,0.7);
-}
-
-tbody tr:nth-child(even) {
-  background: rgba(15,23,42,0.7);
-}
-
-.small-note {
-  margin-top: 0.7rem;
-  font-size: 0.8rem;
-  color: #9ca3af;
-}
-
-/* CHECKLIST */
-
-.checklist {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  font-size: 0.9rem;
-}
-
-.checklist li::before {
-  content: "✔";
-  color: #34d399;
-  margin-right: 0.4rem;
-}
-
-/* CHART */
-
-.chart-wrapper {
-  margin-top: 1rem;
-  background: radial-gradient(circle at top, rgba(30,64,175,0.8), rgba(15,23,42,0.95));
-  padding: 1rem;
-  border-radius: 1.2rem;
-}
-
-/* TRACKING MOCK MAP */
-
-.mock-map {
-  position: relative;
-  margin-top: 1rem;
-  width: 100%;
-  max-width: 520px;
-  height: 220px;
-  border-radius: 1.3rem;
-  background: radial-gradient(circle at top, #1d4ed8, #020617);
-  overflow: hidden;
-}
-
-.route {
-  position: absolute;
-  inset: 30% 12%;
-  border-top: 2px dashed rgba(191,219,254,0.9);
-  border-radius: 999px;
-}
-
-.dot {
-  position: absolute;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  background: rgba(15,23,42,0.9);
-  font-size: 0.75rem;
-}
-
-.dot-start {
-  left: 10%;
-  bottom: 18%;
-}
-
-.dot-end {
-  right: 8%;
-  top: 18%;
-}
-
-.truck {
-  position: absolute;
-  top: 46%;
-  left: 45%;
-  font-size: 1.4rem;
-}
-
-/* ACTIVE PAGE */
-
-.active-page {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* FOOTER */
-
-.app-footer {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #9ca3af;
-  background: #020617;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 900px) {
-  .top-nav {
-    display: none; /* mobiel simpeler maken */
+document.addEventListener("DOMContentLoaded", () => {
+  const loginScreen = document.getElementById("login-screen");
+  const app = document.getElementById("app");
+  const loginForm = document.getElementById("login-form");
+  const loginError = document.getElementById("login-error");
+  const yearSpan = document.getElementById("year");
+  const userTag = document.getElementById("user-tag");
+
+  const navButtons = document.querySelectorAll(".nav-btn");
+  const pages = document.querySelectorAll(".page");
+  const internalPageButtons = document.querySelectorAll("[data-page]");
+
+  if (yearSpan) {
+    yearSpan.textContent = new Date().getFullYear();
   }
 
-  .page-content {
-    padding: 2.2rem 1.4rem;
+  // LOGIN: wachtwoord moet 1234 zijn
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(loginForm);
+    const name = (formData.get("name") || "").toString().trim();
+    const password = (formData.get("password") || "").toString().trim();
+
+    if (password === "1234") {
+      loginError.textContent = "";
+      loginScreen.classList.add("hidden");
+      app.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+      if (name && userTag) {
+        userTag.textContent = name;
+      }
+      showPage("overview");
+      initChart();
+    } else {
+      loginError.textContent = "Onjuist wachtwoord. Gebruik 1234 voor de demo.";
+    }
+  });
+
+  // PAGINA WEERGEVEN
+  function showPage(id) {
+    pages.forEach((page) => {
+      page.classList.toggle("active-page", page.id === id);
+    });
+
+    navButtons.forEach((btn) => {
+      const target = btn.dataset.page;
+      btn.classList.toggle("active", target === id);
+    });
   }
 
-  .card {
-    padding: 1.6rem 1.4rem;
+  // NAV BUTTONS
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.page;
+      if (target) showPage(target);
+    });
+  });
+
+  // INTERNE BUTTONS (bijv. "Bekijk stock" in overview)
+  internalPageButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.page;
+      if (target) showPage(target);
+    });
+  });
+
+  // CHART
+  let chartCreated = false;
+  function initChart() {
+    if (chartCreated) return;
+    const ctx = document.getElementById("stockChart");
+    if (!ctx || typeof Chart === "undefined") return;
+
+    chartCreated = true;
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Carbon prepreg T700", "Epoxy hars 2K", "Glass fabric 450 g/m²"],
+        datasets: [
+          {
+            label: "Stock (kg)",
+            data: [1500, 3200, 7800],
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "#e5e7eb",
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#e5e7eb" },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: "#e5e7eb" },
+            grid: { color: "rgba(148,163,184,0.3)" }
+          }
+        }
+      }
+    });
   }
-}
+});
