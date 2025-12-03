@@ -28,7 +28,7 @@ input, select, textarea {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* AUTH WRAPPER */
