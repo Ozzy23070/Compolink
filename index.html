@@ -4,43 +4,81 @@
   <meta charset="UTF-8">
   <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Font voor mooier lettertype -->
+  <!-- Mooie font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- LOGIN SCHERM -->
-  <div id="login-screen" class="full-screen login-bg">
+  <!-- AUTH WRAPPER: EERST ALLEEN DIT ZICHTBAAR -->
+  <div id="auth-wrapper" class="full-screen login-bg">
     <div class="login-overlay"></div>
     <div class="login-card">
-      <h1>CompoLink demo login</h1>
-      <p>Voor deze demo kun je inloggen met onderstaand wachtwoord.</p>
-      <p class="demo-creds"><strong>Wachtwoord:</strong> 1234 (naam mag je zelf kiezen)</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth="login">Inloggen</button>
+        <button class="auth-tab" data-auth="signup">Account aanmaken</button>
+      </div>
 
-      <form id="login-form">
-        <label>
-          Naam
-          <input type="text" name="name" placeholder="Jouw naam" autocomplete="off">
-        </label>
-        <label>
-          Wachtwoord
-          <input type="password" name="password" placeholder="1234">
-        </label>
-        <button type="submit" class="btn-primary">Inloggen</button>
-        <p id="login-error" class="error-msg"></p>
-      </form>
+      <div class="auth-forms">
+        <!-- LOGIN FORM -->
+        <form id="login-form" class="auth-form active-form">
+          <h1>Welkom bij CompoLink</h1>
+          <p class="auth-text">
+            Log in met je demo-account of met een account dat je zelf hebt aangemaakt.
+          </p>
+          <p class="demo-creds">
+            <strong>Demo-account:</strong> demo@compolink.com / 1234
+          </p>
+
+          <label>
+            E-mailadres
+            <input type="email" name="email" placeholder="jij@bedrijf.com" required>
+          </label>
+          <label>
+            Wachtwoord
+            <input type="password" name="password" placeholder="••••" required>
+          </label>
+          <button type="submit" class="btn-primary full-width">Inloggen</button>
+          <p id="login-error" class="error-msg"></p>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signup-form" class="auth-form">
+          <h1>Account aanmaken</h1>
+          <p class="auth-text">
+            Maak een demo-account aan met je naam en e-mailadres.
+          </p>
+
+          <label>
+            Naam
+            <input type="text" name="name" placeholder="Jouw naam" required>
+          </label>
+          <label>
+            E-mailadres
+            <input type="email" name="email" placeholder="jij@bedrijf.com" required>
+          </label>
+          <label>
+            Wachtwoord
+            <input type="password" name="password" placeholder="Minimaal 4 tekens" minlength="4" required>
+          </label>
+          <button type="submit" class="btn-primary full-width">Account aanmaken</button>
+          <p id="signup-success" class="success-msg"></p>
+          <p id="signup-error" class="error-msg"></p>
+        </form>
+      </div>
     </div>
   </div>
 
-  <!-- HOOFD APP – ALLEEN ZICHTBAAR NA LOGIN -->
-  <div id="app" class="hidden">
+  <!-- APP: PAS NA LOGIN ZICHTBAAR -->
+  <div id="app">
     <header class="app-header">
       <div class="logo">CompoLink</div>
       <nav class="top-nav">
         <button class="nav-btn active" data-page="overview">Overview</button>
         <button class="nav-btn" data-page="stock">Stock</button>
-        <button class="nav-btn" data-page="buyers">Buyers & Suppliers</button>
+        <button class="nav-btn" data-page="buyers">Buyers &amp; Suppliers</button>
         <button class="nav-btn" data-page="analytics">Analytics</button>
+        <button class="nav-btn" data-page="community">Community</button>
+        <button class="nav-btn" data-page="checkout">Checkout</button>
         <button class="nav-btn" data-page="tracking">Tracking</button>
       </nav>
       <div class="user-tag" id="user-tag">Demo user</div>
@@ -60,8 +98,8 @@
               lead time en certificeringen.
             </p>
             <div class="btn-row">
-              <button class="btn-primary" data-page="stock">Bekijk stock</button>
-              <button class="btn-secondary" data-page="buyers">Hoe het werkt</button>
+              <button class="btn-primary" data-go-to="stock">Bekijk stock</button>
+              <button class="btn-secondary" data-go-to="buyers">Hoe het werkt</button>
             </div>
             <ul class="badges">
               <li>RFID track &amp; trace</li>
@@ -146,8 +184,8 @@
               <ul class="checklist">
                 <li>Vergelijk prijs, kwaliteit en lead time per materiaal.</li>
                 <li>Filter op certificeringen en materiaalproperties.</li>
-                <li>Grote bedrijven profiteren van volume-kortingen.</li>
-                <li>Volledige transparantie in min/max order per supplier.</li>
+                <li>Volume-korting voor grote afnames.</li>
+                <li>Transparante min/max order per supplier.</li>
               </ul>
             </div>
             <div>
@@ -155,7 +193,7 @@
               <ul class="checklist">
                 <li>Zet stock online met duidelijke prijzen en voorwaarden.</li>
                 <li>Optimaliseer productieplanning via min/max orders.</li>
-                <li>RFID-ID per batch voor volledige traceerbaarheid.</li>
+                <li>RFID-ID per batch voor traceability.</li>
                 <li>CompoLink rekent een vaste platform fee (bijv. 5%).</li>
               </ul>
             </div>
@@ -163,7 +201,7 @@
         </div>
       </section>
 
-      <!-- ANALYTICS / CHART -->
+      <!-- ANALYTICS -->
       <section id="analytics" class="page page-4">
         <div class="page-overlay"></div>
         <div class="page-content">
@@ -177,8 +215,101 @@
               <canvas id="stockChart"></canvas>
             </div>
             <p class="small-note">
-              Deze grafiek is gebouwd met Chart.js als demo voor jouw conceptuele platform.
+              Grafiek gemaakt met Chart.js – handig om in je presentatie het data-gedeelte te laten zien.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMUNITY CHAT -->
+      <section id="community" class="page page-6">
+        <div class="page-overlay"></div>
+        <div class="page-content">
+          <div class="card chat-card">
+            <h2>Community chat (demo)</h2>
+            <p>
+              Eenvoudige community chat waar buyers en suppliers ideeën kunnen uitwisselen.
+              In deze demo worden berichten lokaal opgeslagen in je browser.
+            </p>
+            <div class="chat-layout">
+              <div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <form id="chat-form">
+                  <div class="chat-form-row">
+                    <input id="chat-input" type="text" placeholder="Schrijf een bericht..." autocomplete="off">
+                    <button type="submit" class="btn-primary">Verstuur</button>
+                  </div>
+                </form>
+                <p class="small-note">
+                  Demo: geen echte accounts of live verbinding. Ideaal om in je project te laten zien hoe een
+                  community-functie eruit zou kunnen zien.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHECKOUT & SHIPPING -->
+      <section id="checkout" class="page page-7">
+        <div class="page-overlay"></div>
+        <div class="page-content">
+          <div class="card wide">
+            <h2>Checkout & verzendkosten (demo)</h2>
+            <p>
+              Hier zie je hoe CompoLink materiaalprijs combineert met automatische verzendkosten.
+              De verzendtarieven zijn een vereenvoudigd voorbeeld gebaseerd op PostNL-achtige zones
+              (geen echte live koppeling).
+            </p>
+            <div class="checkout-grid">
+              <div>
+                <label>
+                  Materiaal
+                  <select id="checkout-material">
+                    <option value="carbon">Carbon prepreg T700</option>
+                    <option value="epoxy">Epoxy hars 2K</option>
+                    <option value="glass">Glass fabric 450 g/m²</option>
+                  </select>
+                </label>
+                <label>
+                  Prijs per kg (€)
+                  <input id="checkout-price" type="number" step="0.01" min="0">
+                </label>
+                <label>
+                  Hoeveelheid (kg)
+                  <input id="checkout-qty" type="number" step="0.1" min="0">
+                </label>
+                <label>
+                  Bestemming
+                  <select id="checkout-destination">
+                    <option value="NL">Nederland</option>
+                    <option value="EU">Europa (buiten NL)</option>
+                  </select>
+                </label>
+                <label>
+                  Postcode
+                  <input id="checkout-postcode" type="text" placeholder="bijv. 2525 CP">
+                </label>
+              </div>
+              <div class="checkout-summary">
+                <div class="checkout-row">
+                  <span>Subtotaal materiaal</span>
+                  <span>€ <span id="checkout-subtotal">0,00</span></span>
+                </div>
+                <div class="checkout-row">
+                  <span>Verzendkosten (voorbeeld)</span>
+                  <span>€ <span id="checkout-shipping">0,00</span></span>
+                </div>
+                <div class="checkout-row total">
+                  <span>Totaal</span>
+                  <span>€ <span id="checkout-total">0,00</span></span>
+                </div>
+                <p class="checkout-note">
+                  Voorbeeld: tot 10 kg geldt een vast tarief per zone, daarboven wordt per extra 10 kg een toeslag berekend.
+                  In een echte koppeling zou CompoLink actuele tarieven ophalen bij PostNL of andere carriers via een API.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -190,8 +321,8 @@
           <div class="card">
             <h2>Tracking & logistiek</h2>
             <p>
-              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt dit aan carriers, zodat buyers
-              en suppliers de status van hun shipment kunnen volgen.
+              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt dit aan carriers, zodat buyers en suppliers
+              de status van hun shipment kunnen volgen.
             </p>
             <div class="mock-map">
               <div class="route"></div>
@@ -200,7 +331,7 @@
               <div class="truck">🚚</div>
             </div>
             <p class="small-note">
-              Deze map is een visuele mock-up. In je verslag kun je hiermee het idee van live tracking uitleggen.
+              Deze map is een visuele mock-up. In je verslag kun je hiermee het concept van live track &amp; trace uitleggen.
             </p>
           </div>
         </div>
