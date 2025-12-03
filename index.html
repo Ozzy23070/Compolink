@@ -8,6 +8,33 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Firebase SDK's via script tags -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // JOUW FIREBASE CONFIG HIER
+const firebaseConfig = {
+    apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
+    authDomain: "compolink-112.firebaseapp.com",
+    projectId: "compolink-112",
+    storageBucket: "compolink-112.firebasestorage.app",
+    messagingSenderId: "1045338539276",
+    appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
+    measurementId: "G-VF4TTS8CJD"
+    };
+
+    // App starten
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- Chart.js + jouw hoofdscript -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+
   <!-- AUTH WRAPPER (LOGIN + SIGNUP) -->
   <div id="auth-wrapper" class="auth-wrapper">
     <div class="auth-bg"></div>
