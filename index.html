@@ -4,84 +4,81 @@
   <meta charset="UTF-8">
   <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Mooie font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- AUTH WRAPPER: EERST ALLEEN DIT ZICHTBAAR -->
-  <div id="auth-wrapper" class="full-screen login-bg">
-    <div class="login-overlay"></div>
-    <div class="login-card">
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-auth="login">Inloggen</button>
-        <button class="auth-tab" data-auth="signup">Account aanmaken</button>
+  <!-- AUTH WRAPPER (LOGIN + SIGNUP) -->
+  <div id="auth-wrapper" class="auth-wrapper">
+    <div class="auth-bg"></div>
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">CompoLink</div>
+        <p class="auth-subtitle">Your digital marketplace for composite materials</p>
       </div>
 
-      <div class="auth-forms">
-        <!-- LOGIN FORM -->
-        <form id="login-form" class="auth-form active-form">
-          <h1>Welkom bij CompoLink</h1>
-          <p class="auth-text">
-            Log in met je demo-account of met een account dat je zelf hebt aangemaakt.
-          </p>
-          <p class="demo-creds">
-            <strong>Demo-account:</strong> demo@compolink.com / 1234
-          </p>
-
-          <label>
-            E-mailadres
-            <input type="email" name="email" placeholder="jij@bedrijf.com" required>
-          </label>
-          <label>
-            Wachtwoord
-            <input type="password" name="password" placeholder="••••" required>
-          </label>
-          <button type="submit" class="btn-primary full-width">Inloggen</button>
-          <p id="login-error" class="error-msg"></p>
-        </form>
-
-        <!-- SIGNUP FORM -->
-        <form id="signup-form" class="auth-form">
-          <h1>Account aanmaken</h1>
-          <p class="auth-text">
-            Maak een demo-account aan met je naam en e-mailadres.
-          </p>
-
-          <label>
-            Naam
-            <input type="text" name="name" placeholder="Jouw naam" required>
-          </label>
-          <label>
-            E-mailadres
-            <input type="email" name="email" placeholder="jij@bedrijf.com" required>
-          </label>
-          <label>
-            Wachtwoord
-            <input type="password" name="password" placeholder="Minimaal 4 tekens" minlength="4" required>
-          </label>
-          <button type="submit" class="btn-primary full-width">Account aanmaken</button>
-          <p id="signup-success" class="success-msg"></p>
-          <p id="signup-error" class="error-msg"></p>
-        </form>
+      <div class="auth-toggle">
+        <button id="login-tab" class="auth-tab active">Inloggen</button>
+        <button id="signup-tab" class="auth-tab">Account aanmaken</button>
       </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="auth-form">
+        <p class="auth-note">
+          Log in met je eigen account of gebruik het demo wachtwoord <strong>1234</strong>.
+        </p>
+        <label>
+          E-mail
+          <input type="email" name="email" placeholder="jij@bedrijf.com" autocomplete="email" required>
+        </label>
+        <label>
+          Wachtwoord
+          <input type="password" name="password" placeholder="1234" required>
+        </label>
+        <button type="submit" class="btn-primary auth-btn">Inloggen</button>
+        <p id="login-error" class="error-msg"></p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="auth-form hidden">
+        <p class="auth-note">
+          Maak een demo-account. Je gegevens worden alleen lokaal in je browser opgeslagen.
+        </p>
+        <label>
+          Naam
+          <input type="text" name="name" placeholder="Jouw naam" required>
+        </label>
+        <label>
+          E-mail
+          <input type="email" name="email" placeholder="jij@bedrijf.com" required>
+        </label>
+        <label>
+          Wachtwoord
+          <input type="password" name="password" placeholder="Kies een wachtwoord" required>
+        </label>
+        <button type="submit" class="btn-primary auth-btn">Account aanmaken</button>
+        <p id="signup-error" class="error-msg"></p>
+      </form>
     </div>
   </div>
 
-  <!-- APP: PAS NA LOGIN ZICHTBAAR -->
-  <div id="app">
+  <!-- HOOFD APP – ZICHTBAAR NA LOGIN -->
+  <div id="app" class="app hidden">
     <header class="app-header">
       <div class="logo">CompoLink</div>
       <nav class="top-nav">
         <button class="nav-btn active" data-page="overview">Overview</button>
         <button class="nav-btn" data-page="stock">Stock</button>
-        <button class="nav-btn" data-page="buyers">Buyers &amp; Suppliers</button>
+        <button class="nav-btn" data-page="buyers">Buyers & Suppliers</button>
         <button class="nav-btn" data-page="analytics">Analytics</button>
-        <button class="nav-btn" data-page="community">Community</button>
-        <button class="nav-btn" data-page="checkout">Checkout</button>
         <button class="nav-btn" data-page="tracking">Tracking</button>
+        <button class="nav-btn" data-page="community">Community chat</button>
+        <button class="nav-btn" data-page="checkout">Checkout</button>
       </nav>
-      <div class="user-tag" id="user-tag">Demo user</div>
+      <div class="header-right">
+        <span class="user-tag" id="user-tag">Demo user</span>
+        <button id="logout-btn" class="btn-ghost">Log uit</button>
+      </div>
     </header>
 
     <main class="pages">
@@ -90,20 +87,21 @@
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card hero-card">
-            <p class="eyebrow">Your digital marketplace for composite materials</p>
+            <p class="eyebrow">YOUR DIGITAL MARKETPLACE FOR COMPOSITE MATERIALS</p>
             <h1>Verbind kopers en suppliers van composietmaterialen.</h1>
             <p>
               CompoLink bundelt Europese composiet-suppliers op één platform.
-              Buyers zien direct welke materialen op voorraad zijn, met prijs, kwaliteit,
-              lead time en certificeringen.
+              Buyers zien direct welke materialen op voorraad zijn, met prijs, kwaliteit, lead time
+              en certificeringen – volledig transparant.
             </p>
             <div class="btn-row">
-              <button class="btn-primary" data-go-to="stock">Bekijk stock</button>
-              <button class="btn-secondary" data-go-to="buyers">Hoe het werkt</button>
+              <button class="btn-primary" data-page="stock">Bekijk stock</button>
+              <button class="btn-secondary" data-page="community">Community chat</button>
             </div>
             <ul class="badges">
               <li>RFID track &amp; trace</li>
               <li>Min / max orders</li>
+              <li>Realtime stock inzicht</li>
               <li>5% platform fee</li>
             </ul>
           </div>
@@ -115,9 +113,10 @@
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
-            <h2>Voorbeeld stock-overzicht</h2>
+            <h2>Actuele stock (demo)</h2>
             <p>
-              Buyers krijgen in één oogopslag inzicht in beschikbare composietmaterialen binnen Europa.
+              Voorbeeld van een stock-pagina met composietmaterialen. Buyers kunnen materialen vergelijken
+              en direct toevoegen aan hun order.
             </p>
             <div class="table-wrapper">
               <table>
@@ -130,11 +129,11 @@
                     <th>Stock (kg)</th>
                     <th>Min (kg)</th>
                     <th>Max (kg)</th>
-                    <th>Kwaliteit</th>
+                    <th>In winkelmand</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr data-item='{"id":"RFID-00123","name":"Carbon prepreg T700","price":24.9,"weight":50}'>
                     <td>RFID-00123</td>
                     <td>Carbon prepreg T700</td>
                     <td>EuroCarbon BV</td>
@@ -142,34 +141,40 @@
                     <td>1.500</td>
                     <td>50</td>
                     <td>500</td>
-                    <td>★★★★☆</td>
+                    <td><button class="btn-small add-to-cart">+ 50 kg</button></td>
                   </tr>
-                  <tr>
+                  <tr data-item='{"id":"RFID-00456","name":"Epoxy hars 2K","price":6.2,"weight":25}'>
                     <td>RFID-00456</td>
                     <td>Epoxy hars 2K</td>
                     <td>ResinTech</td>
                     <td>€6,20</td>
                     <td>3.200</td>
-                    <td>100</td>
-                    <td>1.000</td>
-                    <td>★★★☆☆</td>
+                    <td>25</td>
+                    <td>400</td>
+                    <td><button class="btn-small add-to-cart">+ 25 kg</button></td>
                   </tr>
-                  <tr>
+                  <tr data-item='{"id":"RFID-00991","name":"Glass fabric 450 g/m²","price":4.1,"weight":40}'>
                     <td>RFID-00991</td>
                     <td>Glass fabric 450 g/m²</td>
                     <td>GlassWeave</td>
                     <td>€4,10</td>
                     <td>7.800</td>
-                    <td>200</td>
-                    <td>2.000</td>
-                    <td>★★★★★</td>
+                    <td>40</td>
+                    <td>600</td>
+                    <td><button class="btn-small add-to-cart">+ 40 kg</button></td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p class="small-note">
-              Demo-data – in een echte versie wordt dit gevuld vanuit een database/API met realtime voorraad.
-            </p>
+
+            <div class="cart-summary">
+              <h3>Winkelmand (demo)</h3>
+              <p id="cart-empty-msg">Nog geen items toegevoegd.</p>
+              <ul id="cart-items"></ul>
+              <p><strong>Totaal gewicht:</strong> <span id="cart-weight">0</span> kg</p>
+              <p><strong>Totaal materiaalprijs:</strong> € <span id="cart-total">0.00</span></p>
+              <button class="btn-secondary" data-page="checkout">Ga naar checkout</button>
+            </div>
           </div>
         </div>
       </section>
@@ -183,17 +188,17 @@
               <h2>Buyers</h2>
               <ul class="checklist">
                 <li>Vergelijk prijs, kwaliteit en lead time per materiaal.</li>
-                <li>Filter op certificeringen en materiaalproperties.</li>
-                <li>Volume-korting voor grote afnames.</li>
-                <li>Transparante min/max order per supplier.</li>
+                <li>Filter op certificeringen en materiaal-properties.</li>
+                <li>Volume-kortingen voor grote OEM’s en Tier-1 suppliers.</li>
+                <li>Volledige transparantie in min/max order per leverancier.</li>
               </ul>
             </div>
             <div>
               <h2>Suppliers</h2>
               <ul class="checklist">
-                <li>Zet stock online met duidelijke prijzen en voorwaarden.</li>
-                <li>Optimaliseer productieplanning via min/max orders.</li>
-                <li>RFID-ID per batch voor traceability.</li>
+                <li>Publiceer stock met realtime updates en duidelijke prijzen.</li>
+                <li>Dynamic pricing op basis van volume en contractduur.</li>
+                <li>RFID-ID per batch voor traceerbaarheid door de hele keten.</li>
                 <li>CompoLink rekent een vaste platform fee (bijv. 5%).</li>
               </ul>
             </div>
@@ -208,108 +213,15 @@
           <div class="card wide">
             <h2>Analytics – stock per materiaal</h2>
             <p>
-              Visualisatie van de verdeling van de voorraad per materiaaltype.
-              In een echte app wordt deze grafiek automatisch gevoed met actuele data.
+              Buyers en suppliers kunnen trends in voorraad en verbruik zien. Deze demo laat een
+              eenvoudige verdeling van stock per materiaaltype zien.
             </p>
             <div class="chart-wrapper">
               <canvas id="stockChart"></canvas>
             </div>
             <p class="small-note">
-              Grafiek gemaakt met Chart.js – handig om in je presentatie het data-gedeelte te laten zien.
+              In een echte implementatie wordt deze grafiek gevoed met live data uit het CompoLink-platform.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- COMMUNITY CHAT -->
-      <section id="community" class="page page-6">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card chat-card">
-            <h2>Community chat (demo)</h2>
-            <p>
-              Eenvoudige community chat waar buyers en suppliers ideeën kunnen uitwisselen.
-              In deze demo worden berichten lokaal opgeslagen in je browser.
-            </p>
-            <div class="chat-layout">
-              <div>
-                <div id="chat-messages" class="chat-messages"></div>
-                <form id="chat-form">
-                  <div class="chat-form-row">
-                    <input id="chat-input" type="text" placeholder="Schrijf een bericht..." autocomplete="off">
-                    <button type="submit" class="btn-primary">Verstuur</button>
-                  </div>
-                </form>
-                <p class="small-note">
-                  Demo: geen echte accounts of live verbinding. Ideaal om in je project te laten zien hoe een
-                  community-functie eruit zou kunnen zien.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- CHECKOUT & SHIPPING -->
-      <section id="checkout" class="page page-7">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card wide">
-            <h2>Checkout & verzendkosten (demo)</h2>
-            <p>
-              Hier zie je hoe CompoLink materiaalprijs combineert met automatische verzendkosten.
-              De verzendtarieven zijn een vereenvoudigd voorbeeld gebaseerd op PostNL-achtige zones
-              (geen echte live koppeling).
-            </p>
-            <div class="checkout-grid">
-              <div>
-                <label>
-                  Materiaal
-                  <select id="checkout-material">
-                    <option value="carbon">Carbon prepreg T700</option>
-                    <option value="epoxy">Epoxy hars 2K</option>
-                    <option value="glass">Glass fabric 450 g/m²</option>
-                  </select>
-                </label>
-                <label>
-                  Prijs per kg (€)
-                  <input id="checkout-price" type="number" step="0.01" min="0">
-                </label>
-                <label>
-                  Hoeveelheid (kg)
-                  <input id="checkout-qty" type="number" step="0.1" min="0">
-                </label>
-                <label>
-                  Bestemming
-                  <select id="checkout-destination">
-                    <option value="NL">Nederland</option>
-                    <option value="EU">Europa (buiten NL)</option>
-                  </select>
-                </label>
-                <label>
-                  Postcode
-                  <input id="checkout-postcode" type="text" placeholder="bijv. 2525 CP">
-                </label>
-              </div>
-              <div class="checkout-summary">
-                <div class="checkout-row">
-                  <span>Subtotaal materiaal</span>
-                  <span>€ <span id="checkout-subtotal">0,00</span></span>
-                </div>
-                <div class="checkout-row">
-                  <span>Verzendkosten (voorbeeld)</span>
-                  <span>€ <span id="checkout-shipping">0,00</span></span>
-                </div>
-                <div class="checkout-row total">
-                  <span>Totaal</span>
-                  <span>€ <span id="checkout-total">0,00</span></span>
-                </div>
-                <p class="checkout-note">
-                  Voorbeeld: tot 10 kg geldt een vast tarief per zone, daarboven wordt per extra 10 kg een toeslag berekend.
-                  In een echte koppeling zou CompoLink actuele tarieven ophalen bij PostNL of andere carriers via een API.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -321,8 +233,8 @@
           <div class="card">
             <h2>Tracking & logistiek</h2>
             <p>
-              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt dit aan carriers, zodat buyers en suppliers
-              de status van hun shipment kunnen volgen.
+              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt deze aan logistieke partners zodat
+              buyers realtime de status kunnen volgen: van supplier hub naar productieplant.
             </p>
             <div class="mock-map">
               <div class="route"></div>
@@ -331,8 +243,109 @@
               <div class="truck">🚚</div>
             </div>
             <p class="small-note">
-              Deze map is een visuele mock-up. In je verslag kun je hiermee het concept van live track &amp; trace uitleggen.
+              Deze map is een visuele mock-up. Voor echte integratie wordt gekoppeld met tracking-API’s
+              van carriers (bijv. PostNL, DHL, enz.).
             </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMUNITY CHAT -->
+      <section id="community" class="page page-6">
+        <div class="page-overlay"></div>
+        <div class="page-content">
+          <div class="card wide">
+            <h2>Community chat (demo)</h2>
+            <p>
+              Een plek waar buyers en suppliers korte updates kunnen posten: materiaalbeschikbaarheid,
+              nieuwe certificaten, levertijden, etc. Berichten in deze demo worden in je browser opgeslagen.
+            </p>
+            <div class="chat-box">
+              <div id="chat-messages" class="chat-messages"></div>
+              <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" placeholder="Deel een update of vraag..." required>
+                <button type="submit" class="btn-primary">Verstuur</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHECKOUT + VERZENDKOSTEN -->
+      <section id="checkout" class="page page-7">
+        <div class="page-overlay"></div>
+        <div class="page-content">
+          <div class="card wide">
+            <h2>Checkout & verzendkosten (demo)</h2>
+            <p>
+              Deze demo toont hoe verzendkosten automatisch kunnen worden berekend op basis van
+              bestemming en totaalgewicht. Tarieven zijn benaderingen geïnspireerd op PostNL,
+              maar <strong>geen live of officiële prijzen</strong>.
+            </p>
+
+            <div class="checkout-grid">
+              <div class="checkout-left">
+                <h3>Verzendgegevens</h3>
+                <form id="shipping-form">
+                  <label>
+                    Naam
+                    <input type="text" id="ship-name" placeholder="Naam ontvanger" required>
+                  </label>
+                  <label>
+                    E-mail
+                    <input type="email" id="ship-email" placeholder="ontvanger@bedrijf.com" required>
+                  </label>
+                  <label>
+                    Adres
+                    <input type="text" id="ship-address" placeholder="Straat + huisnummer" required>
+                  </label>
+                  <label>
+                    Postcode
+                    <input type="text" id="ship-zip" placeholder="Bijv. 2525 CP" required>
+                  </label>
+                  <label>
+                    Stad
+                    <input type="text" id="ship-city" placeholder="Den Haag" required>
+                  </label>
+                  <label>
+                    Land / regio
+                    <select id="ship-region" required>
+                      <option value="NL">Nederland</option>
+                      <option value="EU">Europa (EU)</option>
+                      <option value="WORLD">Wereld</option>
+                    </select>
+                  </label>
+                  <label>
+                    Totaal gewicht (kg)
+                    <input type="number" id="ship-weight" min="0" step="0.1" placeholder="Wordt automatisch ingevuld" required>
+                  </label>
+
+                  <button type="submit" class="btn-primary">Bereken verzendkosten</button>
+                </form>
+              </div>
+
+              <div class="checkout-right">
+                <h3>Samenvatting order</h3>
+                <div class="summary-line">
+                  <span>Materiaalprijs</span>
+                  <span>€ <span id="summary-material">0.00</span></span>
+                </div>
+                <div class="summary-line">
+                  <span>Verzendkosten (demo)</span>
+                  <span>€ <span id="summary-shipping">0.00</span></span>
+                </div>
+                <div class="summary-line total">
+                  <span>Totaal</span>
+                  <span>€ <span id="summary-total">0.00</span></span>
+                </div>
+                <p class="small-note">
+                  Verzendtarieven in deze demo:
+                  <br>NL: tot 10 kg ≈ €7, daarna stapjes per 10 kg.
+                  <br>EU: hogere basisprijs, Wereld: nog hoger.
+                  <br>Voor echte koppeling is een officiële PostNL-/carrier-API nodig.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -343,7 +356,6 @@
     </footer>
   </div>
 
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
