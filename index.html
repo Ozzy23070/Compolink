@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Font voor mooier lettertype -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +14,7 @@
     <div class="login-overlay"></div>
     <div class="login-card">
       <h1>CompoLink demo login</h1>
-      <p>Voor deze demo kun je inloggen met het wachtwoord hieronder.</p>
+      <p>Voor deze demo kun je inloggen met onderstaand wachtwoord.</p>
       <p class="demo-creds"><strong>Wachtwoord:</strong> 1234 (naam mag je zelf kiezen)</p>
 
       <form id="login-form">
@@ -30,7 +32,7 @@
     </div>
   </div>
 
-  <!-- HOOFD APP (ALLEEN ZICHTBAAR NA LOGIN) -->
+  <!-- HOOFD APP – ALLEEN ZICHTBAAR NA LOGIN -->
   <div id="app" class="hidden">
     <header class="app-header">
       <div class="logo">CompoLink</div>
@@ -49,18 +51,20 @@
       <section id="overview" class="page page-1 active-page">
         <div class="page-overlay"></div>
         <div class="page-content">
-          <div class="card">
+          <div class="card hero-card">
+            <p class="eyebrow">Your digital marketplace for composite materials</p>
             <h1>Verbind kopers en suppliers van composietmaterialen.</h1>
             <p>
-              CompoLink geeft realtime inzicht in beschikbare materialen, prijzen, kwaliteit en logistiek.
-              Een demo-platform voor jouw project 4.1.
+              CompoLink bundelt Europese composiet-suppliers op één platform.
+              Buyers zien direct welke materialen op voorraad zijn, met prijs, kwaliteit,
+              lead time en certificeringen.
             </p>
             <div class="btn-row">
               <button class="btn-primary" data-page="stock">Bekijk stock</button>
               <button class="btn-secondary" data-page="buyers">Hoe het werkt</button>
             </div>
             <ul class="badges">
-              <li>RFID track & trace</li>
+              <li>RFID track &amp; trace</li>
               <li>Min / max orders</li>
               <li>5% platform fee</li>
             </ul>
@@ -74,7 +78,9 @@
         <div class="page-content">
           <div class="card wide">
             <h2>Voorbeeld stock-overzicht</h2>
-            <p>Demo van hoe buyers realtime stock kunnen zien van verschillende suppliers.</p>
+            <p>
+              Buyers krijgen in één oogopslag inzicht in beschikbare composietmaterialen binnen Europa.
+            </p>
             <div class="table-wrapper">
               <table>
                 <thead>
@@ -124,7 +130,7 @@
               </table>
             </div>
             <p class="small-note">
-              Demo-data – in een echte versie wordt dit gevuld vanuit een database of API met live stockinformatie.
+              Demo-data – in een echte versie wordt dit gevuld vanuit een database/API met realtime voorraad.
             </p>
           </div>
         </div>
@@ -139,39 +145,39 @@
               <h2>Buyers</h2>
               <ul class="checklist">
                 <li>Vergelijk prijs, kwaliteit en lead time per materiaal.</li>
-                <li>Filter op materiaalproperties en certificeringen.</li>
-                <li>Grote bedrijven krijgen voordeel bij hogere afnamevolumes.</li>
-                <li>Volledige transparantie in min / max orders per supplier.</li>
+                <li>Filter op certificeringen en materiaalproperties.</li>
+                <li>Grote bedrijven profiteren van volume-kortingen.</li>
+                <li>Volledige transparantie in min/max order per supplier.</li>
               </ul>
             </div>
             <div>
               <h2>Suppliers</h2>
               <ul class="checklist">
-                <li>Zet je stock online met duidelijke prijzen en voorwaarden.</li>
-                <li>Min / max order per materiaal → betere planning in de fabriek.</li>
-                <li>RFID ID per batch voor traceability in de hele keten.</li>
-                <li>CompoLink rekent een vaste fee (bijv. 5%) per transactie.</li>
+                <li>Zet stock online met duidelijke prijzen en voorwaarden.</li>
+                <li>Optimaliseer productieplanning via min/max orders.</li>
+                <li>RFID-ID per batch voor volledige traceerbaarheid.</li>
+                <li>CompoLink rekent een vaste platform fee (bijv. 5%).</li>
               </ul>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ANALYTICS (CHART) -->
+      <!-- ANALYTICS / CHART -->
       <section id="analytics" class="page page-4">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
             <h2>Analytics – stock per materiaal</h2>
             <p>
-              Grafiek om te laten zien hoe een buyer of supplier inzicht kan krijgen in de verdeling
-              van de voorraad per materiaaltype.
+              Visualisatie van de verdeling van de voorraad per materiaaltype.
+              In een echte app wordt deze grafiek automatisch gevoed met actuele data.
             </p>
             <div class="chart-wrapper">
               <canvas id="stockChart"></canvas>
             </div>
             <p class="small-note">
-              Dit is een Chart.js demo. In een echte app wordt de grafiek automatisch gevuld met realtime data.
+              Deze grafiek is gebouwd met Chart.js als demo voor jouw conceptuele platform.
             </p>
           </div>
         </div>
@@ -184,8 +190,8 @@
           <div class="card">
             <h2>Tracking & logistiek</h2>
             <p>
-              Elke zending krijgt een RFID ID. In de echte CompoLink app wordt dit gekoppeld aan een live
-              kaart en statusupdates per shipment.
+              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt dit aan carriers, zodat buyers
+              en suppliers de status van hun shipment kunnen volgen.
             </p>
             <div class="mock-map">
               <div class="route"></div>
@@ -194,8 +200,7 @@
               <div class="truck">🚚</div>
             </div>
             <p class="small-note">
-              Dit is een visuele mock-up. In jouw rapport kun je hier uitleggen hoe de technische koppeling
-              met RFID, carriers en statusupdates zou werken.
+              Deze map is een visuele mock-up. In je verslag kun je hiermee het idee van live tracking uitleggen.
             </p>
           </div>
         </div>
@@ -212,5 +217,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
