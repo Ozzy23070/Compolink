@@ -2,241 +2,195 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>CompoLink – Marketplace voor Composites</title>
+  <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="container nav">
+  <!-- LOGIN SCHERM -->
+  <div id="login-screen" class="full-screen login-bg">
+    <div class="login-overlay"></div>
+    <div class="login-card">
+      <h1>CompoLink Demo Login</h1>
+      <p>Voor deze demo kun je inloggen met:</p>
+      <p class="demo-creds"><strong>Naam:</strong> 1234 &nbsp;•&nbsp; <strong>Wachtwoord:</strong> 1234</p>
+
+      <form id="login-form">
+        <label>
+          Naam
+          <input type="text" name="name" placeholder="1234" autocomplete="off">
+        </label>
+        <label>
+          Wachtwoord
+          <input type="password" name="password" placeholder="1234">
+        </label>
+        <button type="submit" class="btn-primary">Inloggen</button>
+        <p id="login-error" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- HOOFD APP (VERBORGEN TOT LOGIN GELUKT) -->
+  <div id="app" class="hidden">
+    <header class="app-header">
       <div class="logo">CompoLink</div>
-      <nav class="menu">
-        <a href="#features">Features</a>
-        <a href="#inventory">Stock</a>
-        <a href="#how">Hoe het werkt</a>
-        <a href="#contact" class="btn-small">Contact</a>
+      <nav class="top-nav">
+        <button class="nav-btn active" data-slide="0">Overview</button>
+        <button class="nav-btn" data-slide="1">Stock</button>
+        <button class="nav-btn" data-slide="2">Buyers & Suppliers</button>
+        <button class="nav-btn" data-slide="3">Tracking</button>
       </nav>
-    </div>
-  </header>
+      <div class="user-tag">Demo user</div>
+    </header>
 
-  <main>
-    <!-- HERO -->
-    <section class="hero">
-      <div class="container hero-inner">
-        <div class="hero-text">
-          <h1>Verbind suppliers en kopers van composietmaterialen.</h1>
-          <p>
-            Zie direct welke materialen op voorraad zijn, vergelijk prijs, kwaliteit en levertijd
-            en laat CompoLink de rest doen. Geen verborgen kosten – wij pakken alleen een vaste fee per transactie.
-          </p>
-          <div class="hero-actions">
-            <a href="#inventory" class="btn-primary">Bekijk beschikbare stock</a>
-            <a href="#how" class="btn-secondary">Meer over het platform</a>
-          </div>
-          <p class="hero-note">✓ RFID tracking &nbsp; ✓ Min/max orders &nbsp; ✓ Transparante prijzen</p>
-        </div>
-
-        <div class="hero-card">
-          <h2>Live voorbeeld stock</h2>
-          <div class="stat-row">
-            <div>
-              <span class="stat-label">Suppliers</span>
-              <span class="stat-value">32+</span>
-            </div>
-            <div>
-              <span class="stat-label">Materialen</span>
-              <span class="stat-value">120+</span>
+    <!-- SLIDER -->
+    <main class="slider">
+      <div class="slides">
+        <!-- SLIDE 1 -->
+        <section class="slide slide-1">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="card">
+              <h1>Verbind kopers en suppliers van composietmaterialen.</h1>
+              <p>
+                CompoLink geeft realtime inzicht in beschikbare materialen, prijzen, kwaliteit en logistiek.
+                Een demo-platform voor jouw project 4.1.
+              </p>
+              <div class="btn-row">
+                <button class="btn-primary" data-slide="1">Bekijk stock</button>
+                <button class="btn-secondary" data-slide="2">Hoe het werkt</button>
+              </div>
+              <ul class="badges">
+                <li>RFID track & trace</li>
+                <li>Min / max orders</li>
+                <li>5% platform fee</li>
+              </ul>
             </div>
           </div>
-          <table class="mini-table">
-            <thead>
-              <tr>
-                <th>Materiaal</th>
-                <th>Prijs/kg</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Carbon UD 200 g/m²</td>
-                <td>€18,50</td>
-                <td>3.200 kg</td>
-              </tr>
-              <tr>
-                <td>Epoxy hars SGL-01</td>
-                <td>€7,90</td>
-                <td>5.000 kg</td>
-              </tr>
-              <tr>
-                <td>Glass fabric 300 g/m²</td>
-                <td>€3,40</td>
-                <td>8.750 kg</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="small-note">Data is demo – echte data komt via jouw backend/API.</p>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- FEATURES -->
-    <section id="features" class="section">
-      <div class="container">
-        <h2>Wat zien kopers in de app?</h2>
-        <p class="section-subtitle">
-          Duidelijk overzicht per materiaal: prijs, kwaliteit, track & trace, min/max order en materiaalproperties.
-        </p>
-
-        <div class="grid-3">
-          <div class="card">
-            <h3>Price & Quality</h3>
-            <p>
-              Vergelijk suppliers op prijs per kg, lead time en kwaliteitsrating.
-              Grote afname = meer voordeel voor grote bedrijven.
-            </p>
-          </div>
-          <div class="card">
-            <h3>Stock & Min/Max orders</h3>
-            <p>
-              Zie direct hoeveel er op voorraad is, minimale en maximale ordergrootte
-              en of er batchkorting mogelijk is.
-            </p>
-          </div>
-          <div class="card">
-            <h3>Track & Trace (RFID)</h3>
-            <p>
-              Iedere zending krijgt een RFID ID, zodat je precies weet waar je shipment is
-              in de supply chain.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- INVENTORY TABLE -->
-    <section id="inventory" class="section section-alt">
-      <div class="container">
-        <h2>Voorbeeld van de stock pagina</h2>
-        <p class="section-subtitle">
-          Dit is alleen front-end. Later kun je deze tabel vullen met echte data vanuit je database of API.
-        </p>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>RFID ID</th>
-                <th>Materiaal</th>
-                <th>Supplier</th>
-                <th>Prijs/kg</th>
-                <th>Stock (kg)</th>
-                <th>Min order (kg)</th>
-                <th>Max order (kg)</th>
-                <th>Kwaliteit</th>
-                <th>Lead time</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>RFID-00123</td>
-                <td>Carbon prepreg T700</td>
-                <td>Supplier A</td>
-                <td>€24,90</td>
-                <td>1.500</td>
-                <td>50</td>
-                <td>500</td>
-                <td>★★★★☆</td>
-                <td>5 dagen</td>
-              </tr>
-              <tr>
-                <td>RFID-00456</td>
-                <td>Epoxy hars 2K</td>
-                <td>Supplier B</td>
-                <td>€6,20</td>
-                <td>3.200</td>
-                <td>100</td>
-                <td>1.000</td>
-                <td>★★★☆☆</td>
-                <td>7 dagen</td>
-              </tr>
-              <tr>
-                <td>RFID-00991</td>
-                <td>Glass fabric 450 g/m²</td>
-                <td>Supplier C</td>
-                <td>€4,10</td>
-                <td>7.800</td>
-                <td>200</td>
-                <td>2.000</td>
-                <td>★★★★★</td>
-                <td>3 dagen</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section id="how" class="section">
-      <div class="container">
-        <h2>Hoe werkt het platform?</h2>
-        <div class="steps">
-          <div class="step">
-            <span class="step-number">1</span>
-            <h3>Suppliers</h3>
-            <p>Suppliers zetten hun materialen online met prijs, stock, RFID ID en voorwaarden.</p>
-          </div>
-          <div class="step">
-            <span class="step-number">2</span>
-            <h3>Kopers</h3>
-            <p>Kopers filteren op materiaaltype, prijs, kwaliteit en lead time en plaatsen orders.</p>
-          </div>
-          <div class="step">
-            <span class="step-number">3</span>
-            <h3>CompoLink fee</h3>
-            <p>Per transactie rekent CompoLink een kleine fee (bijv. 5%) voor het platform.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section section-alt">
-      <div class="container">
-        <h2>Contact</h2>
-        <p class="section-subtitle">
-          Wil je deze demo omzetten in een echte web-app met login, chat en live tracking?
-          Laat je gegevens achter.
-        </p>
-
-        <form class="contact-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Naam</label>
-              <input type="text" placeholder="Jouw naam">
-            </div>
-            <div class="form-group">
-              <label>E-mail</label>
-              <input type="email" placeholder="jij@bedrijf.nl">
+        <!-- SLIDE 2 -->
+        <section class="slide slide-2">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="card wide">
+              <h2>Live stock overzicht (demo)</h2>
+              <p>
+                Hier laten you suppliers hun actuele voorraad zien. Buyers filteren op materiaal, prijs,
+                kwaliteit en levertijd.
+              </p>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>RFID ID</th>
+                      <th>Materiaal</th>
+                      <th>Supplier</th>
+                      <th>Prijs / kg</th>
+                      <th>Stock (kg)</th>
+                      <th>Min (kg)</th>
+                      <th>Max (kg)</th>
+                      <th>Kwaliteit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>RFID-00123</td>
+                      <td>Carbon prepreg T700</td>
+                      <td>EuroCarbon BV</td>
+                      <td>€24,90</td>
+                      <td>1.500</td>
+                      <td>50</td>
+                      <td>500</td>
+                      <td>★★★★☆</td>
+                    </tr>
+                    <tr>
+                      <td>RFID-00456</td>
+                      <td>Epoxy hars 2K</td>
+                      <td>ResinTech</td>
+                      <td>€6,20</td>
+                      <td>3.200</td>
+                      <td>100</td>
+                      <td>1.000</td>
+                      <td>★★★☆☆</td>
+                    </tr>
+                    <tr>
+                      <td>RFID-00991</td>
+                      <td>Glass fabric 450 g/m²</td>
+                      <td>GlassWeave</td>
+                      <td>€4,10</td>
+                      <td>7.800</td>
+                      <td>200</td>
+                      <td>2.000</td>
+                      <td>★★★★★</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="small-note">* Demo-data – kan later gekoppeld worden aan echte database/API.</p>
             </div>
           </div>
-          <div class="form-group">
-            <label>Bericht</label>
-            <textarea rows="4" placeholder="Vertel kort wat je zoekt..."></textarea>
-          </div>
-          <button type="submit" class="btn-primary">Verstuur (demo)</button>
-          <p class="small-note">Deze form doet nog niets – later kun je hier bijv. Netlify Forms of een backend aan koppelen.</p>
-        </form>
-      </div>
-    </section>
-  </main>
+        </section>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <span>© <span id="year"></span> CompoLink. Alle rechten voorbehouden.</span>
-      <span>Made by Oguzhan Ates</span>
-    </div>
-  </footer>
+        <!-- SLIDE 3 -->
+        <section class="slide slide-3">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="card two-cols">
+              <div>
+                <h2>Buyers</h2>
+                <ul class="checklist">
+                  <li>Vergelijk suppliers op prijs, kwaliteit en lead time.</li>
+                  <li>Filter op certificeringen en materiaalproperties.</li>
+                  <li>Grote bedrijven krijgen voordeel bij hogere afname.</li>
+                </ul>
+              </div>
+              <div>
+                <h2>Suppliers</h2>
+                <ul class="checklist">
+                  <li>Zet je stock online met duidelijke min/max orders.</li>
+                  <li>Dynamic pricing mogelijk op basis van volume.</li>
+                  <li>CompoLink rekent een vaste fee per transactie (bijv. 5%).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4 -->
+        <section class="slide slide-4">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <div class="card">
+              <h2>Tracking & logistiek</h2>
+              <p>
+                Elke zending krijgt een RFID ID. In het echte platform wordt dit gekoppeld aan een live tracking
+                map en status-updates.
+              </p>
+              <div class="mock-map">
+                <div class="route"></div>
+                <div class="dot dot-start">Supplier</div>
+                <div class="dot dot-end">Buyer</div>
+                <div class="truck">🚚</div>
+              </div>
+              <p class="small-note">Deze map is alleen visual demo – geen echte tracking.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- SLIDER CONTROLS -->
+      <div class="slider-controls">
+        <button class="circle-btn" data-action="prev">‹</button>
+        <span class="slider-indicator" id="slide-indicator">1 / 4</span>
+        <button class="circle-btn" data-action="next">›</button>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <span>© <span id="year"></span> CompoLink – Demo voor project 4.1</span>
+    </footer>
+  </div>
 
   <script src="script.js"></script>
 </body>
