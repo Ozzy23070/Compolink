@@ -4,77 +4,108 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
   const loginError = document.getElementById("login-error");
   const yearSpan = document.getElementById("year");
+  const userTag = document.getElementById("user-tag");
 
-  const VALID_NAME = "1234";
-  const VALID_PASSWORD = "1234";
+  const navButtons = document.querySelectorAll(".nav-btn");
+  const pages = document.querySelectorAll(".page");
+  const internalPageButtons = document.querySelectorAll("[data-page]");
 
   if (yearSpan) {
     yearSpan.textContent = new Date().getFullYear();
   }
 
-  // LOGIN LOGICA
+  // LOGIN: wachtwoord moet 1234 zijn
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const formData = new FormData(loginForm);
     const name = (formData.get("name") || "").toString().trim();
     const password = (formData.get("password") || "").toString().trim();
 
-    if (name === VALID_NAME && password === VALID_PASSWORD) {
+    if (password === "1234") {
       loginError.textContent = "";
       loginScreen.classList.add("hidden");
       app.classList.remove("hidden");
       document.body.style.overflow = "hidden";
+      if (name && userTag) {
+        userTag.textContent = name;
+      }
+      showPage("overview");
+      initChart();
     } else {
-      loginError.textContent = "Onjuiste demo-login. Gebruik 1234 / 1234.";
+      loginError.textContent = "Onjuist wachtwoord. Gebruik 1234 voor de demo.";
     }
   });
 
-  // SLIDER LOGICA
-  const slidesContainer = document.querySelector(".slides");
-  const slideElements = document.querySelectorAll(".slide");
-  const navButtons = document.querySelectorAll("[data-slide]");
-  const prevBtn = document.querySelector("[data-action='prev']");
-  const nextBtn = document.querySelector("[data-action='next']");
-  const indicator = document.getElementById("slide-indicator");
-
-  let currentSlide = 0;
-
-  function updateSlide(index) {
-    const total = slideElements.length;
-    if (index < 0) index = total - 1;
-    if (index >= total) index = 0;
-    currentSlide = index;
-
-    const offset = -index * 100;
-    slidesContainer.style.transform = `translateX(${offset}vw)`;
+  // PAGINA WEERGEVEN
+  function showPage(id) {
+    pages.forEach((page) => {
+      page.classList.toggle("active-page", page.id === id);
+    });
 
     navButtons.forEach((btn) => {
-      const btnIndex = Number(btn.dataset.slide);
-      if (!isNaN(btnIndex)) {
-        btn.classList.toggle("active", btnIndex === index);
-      }
+      const target = btn.dataset.page;
+      btn.classList.toggle("active", target === id);
     });
-
-    if (indicator) {
-      indicator.textContent = `${index + 1} / ${total}`;
-    }
   }
 
+  // NAV BUTTONS
   navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const idx = Number(btn.dataset.slide);
-      if (!isNaN(idx)) {
-        updateSlide(idx);
-      }
+      const target = btn.dataset.page;
+      if (target) showPage(target);
     });
   });
 
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => updateSlide(currentSlide - 1));
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => updateSlide(currentSlide + 1));
-  }
+  // INTERNE BUTTONS (bijv. "Bekijk stock" in overview)
+  internalPageButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.page;
+      if (target) showPage(target);
+    });
+  });
 
-  updateSlide(0);
+  // CHART
+  let chartCreated = false;
+  function initChart() {
+    if (chartCreated) return;
+    const ctx = document.getElementById("stockChart");
+    if (!ctx || typeof Chart === "undefined") return;
+
+    chartCreated = true;
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Carbon prepreg T700", "Epoxy hars 2K", "Glass fabric 450 g/m²"],
+        datasets: [
+          {
+            label: "Stock (kg)",
+            data: [1500, 3200, 7800],
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: "#e5e7eb",
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#e5e7eb" },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: "#e5e7eb" },
+            grid: { color: "rgba(148,163,184,0.3)" }
+          }
+        }
+      }
+    });
+  }
 });
+
