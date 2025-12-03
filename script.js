@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // AUTH ELEMENTEN
+  // ==== FIREBASE INSTELLINGEN ====
+  // We gaan ervan uit dat firebase al is geïnitialiseerd in index.html
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  let currentUser = null;
+  let chatUnsubscribe = null;
+
+  // ==== DOM REFERENTIES ====
   const authWrapper = document.getElementById("auth-wrapper");
   const app = document.getElementById("app");
   const loginTab = document.getElementById("login-tab");
@@ -12,12 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logout-btn");
   const yearSpan = document.getElementById("year");
 
-  // NAV / PAGINA'S
   const navButtons = document.querySelectorAll(".nav-btn");
   const pages = document.querySelectorAll(".page");
   const internalPageButtons = document.querySelectorAll("[data-page]");
 
-  // CART
+  // Cart
   const cartItemsList = document.getElementById("cart-items");
   const cartEmptyMsg = document.getElementById("cart-empty-msg");
   const cartWeightSpan = document.getElementById("cart-weight");
@@ -25,44 +32,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const addToCartButtons = document.querySelectorAll(".add-to-cart");
   let cart = [];
 
-  // CHECKOUT SUMMARY
+  // Checkout
   const materialSummarySpan = document.getElementById("summary-material");
   const shippingSummarySpan = document.getElementById("summary-shipping");
   const totalSummarySpan = document.getElementById("summary-total");
   const shippingForm = document.getElementById("shipping-form");
   const shipWeightInput = document.getElementById("ship-weight");
 
-  // COMMUNITY CHAT
+  // Community chat
   const chatMessagesEl = document.getElementById("chat-messages");
   const chatForm = document.getElementById("chat-form");
   const chatInput = document.getElementById("chat-input");
 
-  // CHART
+  // Chart
   let chartCreated = false;
 
-  if (yearSpan) yearSpan.textContent = new Date().getFullYear();
-
-  /* ---------- AUTH / ACCOUNT ---------- */
-
-  const STORAGE_KEY_USER = "compolinkUser";
-
-  function saveUser(user) {
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+  if (yearSpan) {
+    yearSpan.textContent = new Date().getFullYear();
   }
 
-  function getUser() {
-    const raw = localStorage.getItem(STORAGE_KEY_USER);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
-  function clearUser() {
-    localStorage.removeItem(STORAGE_KEY_USER);
-  }
+  // ==== HELPER FUNCTIES ====
 
   function showAuth() {
     authWrapper.classList.remove("hidden");
@@ -76,9 +65,46 @@ document.addEventListener("DOMContentLoaded", () => {
     showPage("overview");
     initChart();
     syncCartToUI();
+    subscribeToChat();
   }
 
-  // Tabs wisselen
+  function parseFirebaseError(err) {
+    if (!err || !err.code) return "Er ging iets mis. Probeer het opnieuw.";
+    switch (err.code) {
+      case "auth/email-already-in-use":
+        return "Er bestaat al een account met dit e-mailadres.";
+      case "auth/invalid-email":
+        return "Dit is geen geldig e-mailadres.";
+      case "auth/weak-password":
+        return "Kies een sterker wachtwoord (minimaal 6 tekens).";
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+        return "Onjuiste combinatie van e-mail en wachtwoord.";
+      default:
+        return "Er ging iets mis (" + err.code + ").";
+    }
+  }
+
+  // ==== FIREBASE AUTH: STATE CHANGE ====
+
+  auth.onAuthStateChanged((user) => {
+    currentUser = user || null;
+
+    if (user) {
+      const name = user.displayName || user.email || "User";
+      showApp(name);
+    } else {
+      // Uitgelogd
+      if (chatUnsubscribe) {
+        chatUnsubscribe();
+        chatUnsubscribe = null;
+      }
+      showAuth();
+    }
+  });
+
+  // ==== TAB WISSELEN (LOGIN / SIGNUP) ====
+
   loginTab.addEventListener("click", () => {
     loginTab.classList.add("active");
     signupTab.classList.remove("active");
@@ -93,8 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.classList.add("hidden");
   });
 
-  // Sign-up
-  signupForm.addEventListener("submit", (e) => {
+  // ==== SIGNUP (ACCOUNT AANMAKEN) ====
+
+  signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(signupForm);
     const name = data.get("name").toString().trim();
@@ -106,46 +133,51 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    saveUser({ name, email, password });
-    signupError.textContent = "";
-    signupForm.reset();
-
-    // Direct inloggen
-    showApp(name);
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      if (cred.user && name) {
+        await cred.user.updateProfile({ displayName: name });
+      }
+      signupError.textContent = "";
+      signupForm.reset();
+      // auth.onAuthStateChanged toont automatisch de app
+    } catch (err) {
+      signupError.textContent = parseFirebaseError(err);
+    }
   });
 
-  // Login
-  loginForm.addEventListener("submit", (e) => {
+  // ==== LOGIN ====
+
+  loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(loginForm);
     const email = data.get("email").toString().trim().toLowerCase();
     const password = data.get("password").toString().trim();
 
-    const storedUser = getUser();
+    try {
+      if (password === "1234") {
+        // Demo login als anonieme gebruiker
+        await auth.signInAnonymously();
+        loginError.textContent = "";
+        loginForm.reset();
+        return;
+      }
 
-    // Demo login
-    if (password === "1234") {
+      await auth.signInWithEmailAndPassword(email, password);
       loginError.textContent = "";
-      const demoName = email || "Demo user";
-      showApp(demoName);
-      return;
+      loginForm.reset();
+    } catch (err) {
+      loginError.textContent = parseFirebaseError(err);
     }
-
-    if (!storedUser || storedUser.email !== email || storedUser.password !== password) {
-      loginError.textContent = "Onjuiste combinatie van e-mail en wachtwoord.";
-      return;
-    }
-
-    loginError.textContent = "";
-    showApp(storedUser.name);
   });
 
-  // Logout
+  // ==== LOGOUT ====
+
   logoutBtn.addEventListener("click", () => {
-    showAuth();
+    auth.signOut();
   });
 
-  /* ---------- PAGINA NAVIGATIE ---------- */
+  // ==== PAGINA NAVIGATIE ====
 
   function showPage(id) {
     pages.forEach((page) => {
@@ -176,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ---------- CART LOGICA ---------- */
+  // ==== CART LOGICA ====
 
   function syncCartToUI() {
     if (!cartItemsList || !cartWeightSpan || !cartTotalSpan) return;
@@ -190,7 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
       totalPrice += item.totalPrice;
 
       const li = document.createElement("li");
-      li.textContent = `${item.name} – ${item.totalWeight} kg (€${item.totalPrice.toFixed(2)})`;
+      li.textContent = `${item.name} – ${item.totalWeight} kg (€${item.totalPrice.toFixed(
+        2
+      )})`;
       cartItemsList.appendChild(li);
     });
 
@@ -237,18 +271,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ---------- CHECKOUT / VERZENDKOSTEN ---------- */
+  // ==== CHECKOUT / VERZENDKOSTEN ====
 
   function calculateShipping(region, weightKg) {
-    // Demo-tarieven, geïnspireerd op PostNL-achtige logica
     if (weightKg <= 0) return 0;
 
     let base = 0;
     let step = 0;
     switch (region) {
       case "NL":
-        base = 7; // tot 10 kg
-        step = 4; // per extra 10 kg
+        base = 7;
+        step = 4;
         break;
       case "EU":
         base = 15;
@@ -274,89 +307,94 @@ document.addEventListener("DOMContentLoaded", () => {
     shippingForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const region = document.getElementById("ship-region").value;
-      const weight = parseFloat(document.getElementById("ship-weight").value || "0");
-      const materialTotal = parseFloat(materialSummarySpan?.textContent || "0");
+      const weight = parseFloat(
+        document.getElementById("ship-weight").value || "0"
+      );
+      const materialTotal = parseFloat(
+        materialSummarySpan?.textContent || "0"
+      );
 
       const shippingCost = calculateShipping(region, weight);
       const total = materialTotal + shippingCost;
 
-      if (shippingSummarySpan) shippingSummarySpan.textContent = shippingCost.toFixed(2);
-      if (totalSummarySpan) totalSummarySpan.textContent = total.toFixed(2);
+      if (shippingSummarySpan)
+        shippingSummarySpan.textContent = shippingCost.toFixed(2);
+      if (totalSummarySpan)
+        totalSummarySpan.textContent = total.toFixed(2);
     });
   }
 
-  /* ---------- COMMUNITY CHAT ---------- */
+  // ==== COMMUNITY CHAT MET FIRESTORE ====
 
-  const STORAGE_KEY_CHAT = "compolinkChat";
-
-  function loadChatMessages() {
-    const raw = localStorage.getItem(STORAGE_KEY_CHAT);
-    if (!raw) return [];
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return [];
-    }
-  }
-
-  function saveChatMessages(msgs) {
-    localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(msgs));
-  }
-
-  let chatMessages = loadChatMessages();
-  if (chatMessages.length === 0) {
-    chatMessages = [
-      {
-        user: "MaterialBuyer123",
-        text: "Zoekt iemand T700 prepreg met korte lead time binnen de EU?",
-        time: "08:15",
-      },
-      {
-        user: "SupplierCarbonEU",
-        text: "Wij hebben nog 1.5 ton T700 op voorraad, leverbaar binnen 5 werkdagen.",
-        time: "08:22",
-      },
-    ];
-    saveChatMessages(chatMessages);
-  }
-
-  function renderChat() {
+  function renderChatFromSnapshot(docs) {
     if (!chatMessagesEl) return;
     chatMessagesEl.innerHTML = "";
-    chatMessages.forEach((msg) => {
+    docs.forEach((doc) => {
+      const data = doc.data();
       const div = document.createElement("div");
       div.className = "chat-message";
+      const user = data.user || "User";
+      const time = data.time || "";
+      const text = data.text || "";
       div.innerHTML = `
-        <div class="chat-meta">${msg.user} • ${msg.time}</div>
-        <div class="chat-text">${msg.text}</div>
+        <div class="chat-meta">${user} • ${time}</div>
+        <div class="chat-text">${text}</div>
       `;
       chatMessagesEl.appendChild(div);
     });
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
   }
 
-  renderChat();
+  function subscribeToChat() {
+    if (!db || !chatMessagesEl) return;
+
+    if (chatUnsubscribe) {
+      chatUnsubscribe();
+    }
+
+    chatUnsubscribe = db
+      .collection("messages")
+      .orderBy("createdAt")
+      .limit(50)
+      .onSnapshot(
+        (snapshot) => {
+          renderChatFromSnapshot(snapshot.docs);
+        },
+        (err) => {
+          console.error("Chat subscribe error", err);
+        }
+      );
+  }
 
   if (chatForm) {
-    chatForm.addEventListener("submit", (e) => {
+    chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
 
-      const userName = userTag ? userTag.textContent || "User" : "User";
+      const name = currentUser
+        ? currentUser.displayName || currentUser.email || "User"
+        : "Anon";
       const now = new Date();
-      const time = `${String(now.getHours()).padStart(2,"0")}:${String(
+      const time = `${String(now.getHours()).padStart(2, "0")}:${String(
         now.getMinutes()
-      ).padStart(2,"0")}`;
+      ).padStart(2, "0")}`;
 
-      chatMessages.push({ user: userName, text, time });
-      saveChatMessages(chatMessages);
-      chatInput.value = "";
-      renderChat();
+      try {
+        await db.collection("messages").add({
+          text,
+          user: name,
+          time,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        chatInput.value = "";
+      } catch (err) {
+        console.error("Chat send error", err);
+      }
     });
   }
 
-  /* ---------- ANALYTICS CHART ---------- */
+  // ==== ANALYTICS CHART ====
 
   function initChart() {
     if (chartCreated) return;
@@ -368,7 +406,11 @@ document.addEventListener("DOMContentLoaded", () => {
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["Carbon prepreg T700", "Epoxy hars 2K", "Glass fabric 450 g/m²"],
+        labels: [
+          "Carbon prepreg T700",
+          "Epoxy hars 2K",
+          "Glass fabric 450 g/m²",
+        ],
         datasets: [
           {
             label: "Stock (kg)",
