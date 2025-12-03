@@ -25,10 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
       loginError.textContent = "";
       loginScreen.classList.add("hidden");
       app.classList.remove("hidden");
-      document.body.style.overflow = "hidden";
+
       if (name && userTag) {
         userTag.textContent = name;
       }
+
       showPage("overview");
       initChart();
     } else {
@@ -36,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // PAGINA WEERGEVEN
+  // Pagina tonen
   function showPage(id) {
     pages.forEach((page) => {
       page.classList.toggle("active-page", page.id === id);
@@ -48,24 +49,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // NAV BUTTONS
+  // Bovenste navigatie
   navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.page;
-      if (target) showPage(target);
+      if (target) {
+        showPage(target);
+        if (target === "analytics") initChart();
+      }
     });
   });
 
-  // INTERNE BUTTONS (bijv. "Bekijk stock" in overview)
+  // Interne knoppen (bijv. "Bekijk stock" in hero)
   internalPageButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.page;
-      if (target) showPage(target);
+      if (target) {
+        showPage(target);
+        if (target === "analytics") initChart();
+      }
     });
   });
 
-  // CHART
+  // Chart.js grafiek
   let chartCreated = false;
+
   function initChart() {
     if (chartCreated) return;
     const ctx = document.getElementById("stockChart");
@@ -108,4 +116,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
