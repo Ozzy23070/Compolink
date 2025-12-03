@@ -1,127 +1,80 @@
-// Simple demo cart using localStorage so it works across pages
-const CART_KEY = "compolink_demo_cart";
+document.addEventListener("DOMContentLoaded", () => {
+  const loginScreen = document.getElementById("login-screen");
+  const app = document.getElementById("app");
+  const loginForm = document.getElementById("login-form");
+  const loginError = document.getElementById("login-error");
+  const yearSpan = document.getElementById("year");
 
-function getCart() {
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {
-    return [];
-  }
-}
+  const VALID_NAME = "1234";
+  const VALID_PASSWORD = "1234";
 
-function saveCart(cart) {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-}
-
-function updateCartCount() {
-  const countEl = document.querySelector("[data-cart-count]");
-  if (!countEl) return;
-  const cart = getCart();
-  countEl.textContent = cart.length;
-}
-
-function renderCart() {
-  const itemsEl = document.querySelector("[data-cart-items]");
-  const totalEl = document.querySelector("[data-cart-total]");
-  if (!itemsEl || !totalEl) return;
-
-  const cart = getCart();
-
-  if (!cart.length) {
-    itemsEl.innerHTML = '<p class="cart-empty">No materials selected yet.</p>';
-    totalEl.textContent = "€0.00";
-    return;
+  if (yearSpan) {
+    yearSpan.textContent = new Date().getFullYear();
   }
 
-  itemsEl.innerHTML = "";
-  let total = 0;
+  // LOGIN LOGICA
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(loginForm);
+    const name = (formData.get("name") || "").toString().trim();
+    const password = (formData.get("password") || "").toString().trim();
 
-  cart.forEach((item, index) => {
-    const row = document.createElement("div");
-    row.className = "cart-item";
-    row.innerHTML = `
-      <div>
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-meta">Demo price per kg</div>
-      </div>
-      <div>
-        <div class="cart-item-price">€${item.price.toFixed(2)}</div>
-        <button class="cart-remove" data-remove-index="${index}">Remove</button>
-      </div>
-    `;
-    total += item.price;
-    itemsEl.appendChild(row);
+    if (name === VALID_NAME && password === VALID_PASSWORD) {
+      loginError.textContent = "";
+      loginScreen.classList.add("hidden");
+      app.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    } else {
+      loginError.textContent = "Onjuiste demo-login. Gebruik 1234 / 1234.";
+    }
   });
 
-  totalEl.textContent = `€${total.toFixed(2)}`;
-}
+  // SLIDER LOGICA
+  const slidesContainer = document.querySelector(".slides");
+  const slideElements = document.querySelectorAll(".slide");
+  const navButtons = document.querySelectorAll("[data-slide]");
+  const prevBtn = document.querySelector("[data-action='prev']");
+  const nextBtn = document.querySelector("[data-action='next']");
+  const indicator = document.getElementById("slide-indicator");
 
-// Add item from buttons with data-add-to-cart
-function setupAddToCartButtons() {
-  const buttons = document.querySelectorAll("[data-add-to-cart]");
-  buttons.forEach((btn) => {
+  let currentSlide = 0;
+
+  function updateSlide(index) {
+    const total = slideElements.length;
+    if (index < 0) index = total - 1;
+    if (index >= total) index = 0;
+    currentSlide = index;
+
+    const offset = -index * 100;
+    slidesContainer.style.transform = `translateX(${offset}vw)`;
+
+    navButtons.forEach((btn) => {
+      const btnIndex = Number(btn.dataset.slide);
+      if (!isNaN(btnIndex)) {
+        btn.classList.toggle("active", btnIndex === index);
+      }
+    });
+
+    if (indicator) {
+      indicator.textContent = `${index + 1} / ${total}`;
+    }
+  }
+
+  navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const name = btn.dataset.name || "Unknown material";
-      const price = parseFloat(btn.dataset.price || "0") || 0;
-      const cart = getCart();
-      cart.push({ name, price });
-      saveCart(cart);
-      updateCartCount();
-      renderCart();
-
-      // small feedback
-      const originalText = btn.textContent;
-      btn.textContent = "Added!";
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }, 800);
+      const idx = Number(btn.dataset.slide);
+      if (!isNaN(idx)) {
+        updateSlide(idx);
+      }
     });
   });
-}
 
-function setupCartOverlay() {
-  const overlay = document.querySelector("[data-cart-overlay]");
-  const openBtn = document.querySelector("[data-open-cart]");
-  const closeBtn = document.querySelector("[data-close-cart]");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => updateSlide(currentSlide - 1));
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => updateSlide(currentSlide + 1));
+  }
 
-  if (!overlay || !openBtn || !closeBtn) return;
-
-  openBtn.addEventListener("click", () => {
-    renderCart();
-    overlay.classList.add("visible");
-  });
-
-  closeBtn.addEventListener("click", () => {
-    overlay.classList.remove("visible");
-  });
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-      overlay.classList.remove("visible");
-    }
-  });
-
-  // Remove item handler (event delegation)
-  overlay.addEventListener("click", (e) => {
-    const removeBtn = e.target.closest("[data-remove-index]");
-    if (!removeBtn) return;
-    const index = parseInt(removeBtn.dataset.removeIndex, 10);
-    const cart = getCart();
-    if (index >= 0 && index < cart.length) {
-      cart.splice(index, 1);
-      saveCart(cart);
-      updateCartCount();
-      renderCart();
-    }
-  });
-}
-
-// Init
-updateCartCount();
-setupAddToCartButtons();
-setupCartOverlay();
+  updateSlide(0);
+});
