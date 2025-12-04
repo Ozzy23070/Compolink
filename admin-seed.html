@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="container" style="padding: 2rem;">
-    <h1>Admin – Seed demo suppliers & certificates</h1>
+    <h1>Admin – Seed demo suppliers &amp; certificates</h1>
     <p>Klik eenmalig op de knop om demo-bedrijven in Firestore te zetten.</p>
 
     <button onclick="seedCompaniesAndCertificates()">
@@ -17,22 +17,32 @@
     <p id="seed-status" style="margin-top: 1rem; font-weight: bold;"></p>
   </div>
 
- <script>
-    // JOUW FIREBASE CONFIG HIER
-const firebaseConfig = {
-    apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-    authDomain: "compolink-112.firebaseapp.com",
-    projectId: "compolink-112",
-    storageBucket: "compolink-112.firebasestorage.app",
-    messagingSenderId: "1045338539276",
-    appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-    measurementId: "G-VF4TTS8CJD"
+  <!-- 1. Firebase SDK's (v8, is prima voor jouw setup) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <!-- 2. Jouw Firebase config + init -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2BSCdGFPFNaLTn7d5wpbDJLjAlWe6VXY",
+      authDomain: "compolink-112.firebaseapp.com",
+      projectId: "compolink-112",
+      storageBucket: "compolink-112.appspot.com",
+      messagingSenderId: "1043538539276",
+      appId: "1:1043538539276:web:7dbc0b80b0889d3dd7529",
+      measurementId: "G-VF4FTS8CJD"
     };
 
-  <!-- jouw bestaande script, met de seed-code onderaan -->
+    // Firebase initialiseren
+    firebase.initializeApp(firebaseConfig);
+    // Firestore instance, wordt in script.js gebruikt
+    const db = firebase.firestore();
+  </script>
+
+  <!-- 3. Jouw bestaande script, met de seed-code onderaan -->
   <script src="script.js"></script>
 
-  <!-- kleine helper om status op de pagina te tonen -->
+  <!-- 4. Kleine helper om status op de pagina te tonen -->
   <script>
     window.updateSeedStatus = function (text) {
       document.getElementById("seed-status").innerText = text;
@@ -40,3 +50,4 @@ const firebaseConfig = {
   </script>
 </body>
 </html>
+
