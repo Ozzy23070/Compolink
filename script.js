@@ -442,3 +442,168 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+// ================== DEMO SUPPLIERS & CERTIFICATES SEED ==================
+
+/**
+ * LET OP:
+ * In dit script ga ik ervan uit dat je hierboven in script.js al Firestore
+ * hebt geïnitialiseerd, bijvoorbeeld:
+ *   const db = firebase.firestore();
+ * Laat dat gewoon staan zoals het is.
+ */
+
+const companiesSeed = {
+  "toray-nijverdal": {
+    company: {
+      name: "Toray Advanced Composites Netherlands B.V.",
+      street: "G. van der Muelenweg 2",
+      postalCode: "7443 RE",
+      city: "Nijverdal",
+      country: "Netherlands",
+      website: "https://www.toraytac.com",
+      sectors: ["Aerospace", "Industrial"],
+      mainCertificates: ["EN 9100", "ISO 9001"],
+      continent: "Europe",
+    },
+    certificates: {
+      en9100: {
+        standard: "EN 9100:2018 / AS9100D",
+        type: "Quality management - aerospace",
+        issuer: "LRQA",
+        site: "Nijverdal, NL",
+        scopeShort:
+          "Prepregs & laminated composites for aerospace and industrial applications",
+        downloadUrl: "",
+      },
+      iso9001: {
+        standard: "ISO 9001:2015",
+        type: "Quality management",
+        issuer: "LRQA",
+        site: "Nijverdal, NL",
+        scopeShort:
+          "Quality management system for composite material production",
+      },
+    },
+  },
+
+  "sgl-meitingen": {
+    company: {
+      name: "SGL Carbon GmbH",
+      street: "Werner-von-Siemens-Straße 18",
+      postalCode: "86405",
+      city: "Meitingen",
+      country: "Germany",
+      website: "https://www.sglcarbon.com",
+      sectors: ["Aerospace", "Automotive", "Energy"],
+      mainCertificates: ["ISO 9001", "ISO 14001", "ISO 45001"],
+      continent: "Europe",
+    },
+    certificates: {
+      iso9001: {
+        standard: "ISO 9001:2015",
+        type: "Quality management",
+        issuer: "TÜV",
+        site: "Meitingen, DE",
+        scopeShort:
+          "Quality management for carbon and graphite products",
+      },
+      iso14001: {
+        standard: "ISO 14001:2015",
+        type: "Environmental management",
+        issuer: "TÜV",
+        site: "Meitingen, DE",
+        scopeShort:
+          "Environmental management system for production sites",
+      },
+    },
+  },
+
+  "gurit-uk": {
+    company: {
+      name: "Gurit (UK) Ltd",
+      street: "St Cross Business Park",
+      postalCode: "PO30 5WU",
+      city: "Newport, Isle of Wight",
+      country: "United Kingdom",
+      website: "https://www.gurit.com",
+      sectors: ["Wind", "Marine", "Aerospace"],
+      mainCertificates: ["ISO 9001", "ISO 14001", "ISO 45001"],
+      continent: "Europe",
+    },
+    certificates: {
+      iso9001: {
+        standard: "ISO 9001:2015",
+        type: "Quality management",
+        issuer: "LRQA",
+        site: "UK sites",
+        scopeShort:
+          "Quality management for composite materials and adhesives",
+      },
+    },
+  },
+
+  "porcher-fr": {
+    company: {
+      name: "Porcher Industries",
+      street: "75 Route Départementale 1085",
+      postalCode: "38300",
+      city: "Eclose-Badinières",
+      country: "France",
+      website: "https://www.porcher-ind.com",
+      sectors: ["Technical textiles", "Thermoplastic composites"],
+      mainCertificates: ["ISO 50001", "ISO 9001 (sites)"],
+      continent: "Europe",
+    },
+    certificates: {
+      iso50001: {
+        standard: "ISO 50001",
+        type: "Energy management",
+        issuer: "AFNOR",
+        site: "French sites",
+        scopeShort:
+          "Energy management system for industrial sites",
+      },
+    },
+  },
+};
+
+// status in HTML updaten als er een functie is
+function setSeedStatus(text) {
+  if (window.updateSeedStatus) {
+    window.updateSeedStatus(text);
+  }
+  console.log(text);
+}
+
+// wereldwijd beschikbaar maken zodat we het in HTML kunnen aanroepen
+window.seedCompaniesAndCertificates = async function () {
+  try {
+    if (typeof db === "undefined") {
+      console.error("Firestore 'db' is niet gedefinieerd. Check je firebase init.");
+      return;
+    }
+
+    setSeedStatus("Bezig met seeden...");
+
+    const ops = [];
+
+    for (const [companyId, data] of Object.entries(companiesSeed)) {
+      const company = data.company;
+      const certs = data.certificates || {};
+
+      const companyRef = db.collection("companies").doc(companyId);
+      ops.push(companyRef.set(company, { merge: true }));
+
+      for (const [certId, certData] of Object.entries(certs)) {
+        const certRef = companyRef.collection("certificates").doc(certId);
+        ops.push(certRef.set(certData, { merge: true }));
+      }
+    }
+
+    await Promise.all(ops);
+    setSeedStatus("Klaar! Bedrijven en certificaten staan nu in Firestore.");
+  } catch (err) {
+    console.error(err);
+    setSeedStatus("Fout bij seeden: " + err.message);
+  }
+};
