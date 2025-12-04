@@ -44,27 +44,56 @@ const firebaseConfig = {
         <p class="auth-subtitle">Your digital marketplace for composite materials</p>
       </div>
 
-      <div class="auth-toggle">
-        <button id="login-tab" class="auth-tab active">Inloggen</button>
-        <button id="signup-tab" class="auth-tab">Account aanmaken</button>
-      </div>
+    <!-- tabs bovenin -->
+<div class="auth-tabs">
+  <button id="login-tab" class="auth-tab active">Inloggen</button>
+  <button id="signup-tab" class="auth-tab">Account aanmaken</button>
+</div>
 
-      <!-- LOGIN FORM -->
-      <form id="login-form" class="auth-form">
-        <p class="auth-note">
-          Log in met je eigen account of gebruik het demo wachtwoord <strong>1234</strong>.
-        </p>
-        <label>
-          E-mail
-          <input type="email" name="email" placeholder="jij@bedrijf.com" autocomplete="email" required>
-        </label>
-        <label>
-          Wachtwoord
-          <input type="password" name="password" placeholder="1234" required>
-        </label>
-        <button type="submit" class="btn-primary auth-btn">Inloggen</button>
-        <p id="login-error" class="error-msg"></p>
-      </form>
+<!-- LOGIN FORM -->
+<form id="login-form" class="auth-form">
+  <label>
+    E-mail
+    <input type="email" id="login-email" required />
+  </label>
+  <label>
+    Wachtwoord
+    <input type="password" id="login-password" required />
+  </label>
+  <button type="submit">Inloggen</button>
+</form>
+
+<!-- SIGNUP FORM -->
+<form id="signup-form" class="auth-form hidden">
+  <label>
+    Naam
+    <input type="text" id="signup-name" required />
+  </label>
+  <label>
+    E-mail
+    <input type="email" id="signup-email" required />
+  </label>
+  <label>
+    Wachtwoord
+    <input type="password" id="signup-password" required />
+  </label>
+
+  <!-- NIEUW: rol kiezen -->
+  <fieldset class="auth-role">
+    <legend>Accounttype</legend>
+    <label>
+      <input type="radio" name="signup-role" value="buyer" checked />
+      Koper (buyer)
+    </label>
+    <label>
+      <input type="radio" name="signup-role" value="supplier" />
+      Verkoper (supplier)
+    </label>
+  </fieldset>
+
+  <button type="submit">Account aanmaken</button>
+</form>
+
 
       <!-- SIGNUP FORM -->
       <form id="signup-form" class="auth-form hidden">
