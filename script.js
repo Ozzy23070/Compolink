@@ -146,36 +146,112 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ==== LOGIN ====
+  // ===== AUTH – DEMO LOCAL STORAGE =====
 
-  loginForm.addEventListener("submit", async (e) => {
+const STORAGE_KEY_USER = "compolinkUser";
+
+function getCurrentUser() {
+  const raw = localStorage.getItem(STORAGE_KEY_USER);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveCurrentUser(user) {
+  localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+}
+
+function logoutUser() {
+  localStorage.removeItem(STORAGE_KEY_USER);
+  // eventueel redirect of UI refresh
+  location.reload();
+}
+
+function initAuthUI() {
+  const loginTab = document.getElementById("login-tab");
+  const signupTab = document.getElementById("signup-tab");
+  const loginForm = document.getElementById("login-form");
+  const signupForm = document.getElementById("signup-form");
+
+  if (!loginForm || !signupForm) return; // niet op deze pagina
+
+  // tabs
+  loginTab.addEventListener("click", () => {
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
+  });
+
+  signupTab.addEventListener("click", () => {
+    signupTab.classList.add("active");
+    loginTab.classList.remove("active");
+    signupForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+  });
+
+  // signup
+  signupForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const data = new FormData(loginForm);
-    const email = data.get("email").toString().trim().toLowerCase();
-    const password = data.get("password").toString().trim();
+    const name = document.getElementById("signup-name").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const role = document.querySelector("input[name='signup-role']:checked").value;
 
-    try {
-      if (password === "1234") {
-        // Demo login als anonieme gebruiker
-        await auth.signInAnonymously();
-        loginError.textContent = "";
-        loginForm.reset();
-        return;
-      }
+    if (!name || !email || !password) return;
 
-      await auth.signInWithEmailAndPassword(email, password);
-      loginError.textContent = "";
-      loginForm.reset();
-    } catch (err) {
-      loginError.textContent = parseFirebaseError(err);
+    const user = {
+      name,
+      email,
+      password, // demo only! normaal nooit wachtwoord plain opslaan
+      role,     // "buyer" of "supplier"
+      createdAt: new Date().toISOString(),
+    };
+
+    saveCurrentUser(user);
+    alert("Account aangemaakt als " + role + ".");
+    location.reload();
+  });
+
+  // login
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    const user = getCurrentUser();
+    if (!user || user.email !== email || user.password !== password) {
+      alert("Onjuiste inloggegevens voor deze demo.");
+      return;
     }
+
+    alert("Ingelogd als " + user.role + ".");
+    location.reload();
   });
 
-  // ==== LOGOUT ====
+  // toon gebruiker in de navigatie (bijv. rechtsboven)
+  const user = getCurrentUser();
+  const userDisplay = document.getElementById("nav-username");
+  const logoutBtn = document.getElementById("nav-logout");
+  if (user && userDisplay && logoutBtn) {
+    userDisplay.textContent = user.name;
+    logoutBtn.classList.remove("hidden");
+    logoutBtn.addEventListener("click", logoutUser);
+  }
+}
 
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut();
-  });
+// DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  initAuthUI();
+  initStockPage();
+  initSuppliersPage();
+  initTrackingPage();
+  initCheckoutPage();
+});
+
 
   // ==== PAGINA NAVIGATIE ====
 
