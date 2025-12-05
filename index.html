@@ -5,8 +5,141 @@
   <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- JOUW EIGEN STYLES => hier zit je achtergrond / blur / layout / logo in -->
+  <!-- JOUW EIGEN STYLES: achtergrond / blur / layout / logo -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Extra styling alleen voor de community layout -->
+  <style>
+    .community-layout {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .community-sidebar {
+      width: 220px;
+      font-size: 0.85rem;
+      border-right: 1px solid rgba(148, 163, 184, 0.25);
+      padding-right: 12px;
+    }
+    .community-sidebar h3 {
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+    .group-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .group-btn {
+      width: 100%;
+      text-align: left;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .group-btn:hover {
+      border-color: #60a5fa;
+    }
+    .group-btn.active {
+      border-color: #3b82f6;
+      background: rgba(37, 99, 235, 0.25);
+    }
+    .community-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .post-form textarea {
+      width: 100%;
+      min-height: 70px;
+      resize: vertical;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.98);
+      color: #e5e7eb;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    .post-form textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+    .post-form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .post-form input[type="file"] {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      max-width: 60%;
+    }
+    .post-feed {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .post-card {
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 8px 10px;
+      font-size: 0.86rem;
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .post-text {
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+    .post-image {
+      margin-top: 4px;
+      border-radius: 10px;
+      max-width: 100%;
+      display: block;
+    }
+    .post-file {
+      margin-top: 4px;
+      display: inline-block;
+      font-size: 0.8rem;
+      color: #93c5fd;
+      text-decoration: underline;
+    }
+    @media (max-width: 900px) {
+      .community-layout {
+        flex-direction: column;
+      }
+      .community-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        padding-bottom: 8px;
+        margin-bottom: 6px;
+      }
+      .post-form input[type="file"] {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -19,7 +152,6 @@
         <p class="auth-subtitle">Your digital marketplace for composite materials</p>
       </div>
 
-      <!-- tabs bovenin -->
       <div class="auth-tabs">
         <button id="login-tab" class="auth-tab active">Inloggen</button>
         <button id="signup-tab" class="auth-tab">Account aanmaken</button>
@@ -57,7 +189,6 @@
           <input type="password" id="signup-password" name="password" placeholder="Kies een wachtwoord" required>
         </label>
 
-        <!-- GEEN fieldset meer om die lelijke rand weg te halen -->
         <label>Accounttype</label>
         <div class="auth-role">
           <label>
@@ -86,7 +217,7 @@
         <button class="nav-btn" data-page="buyers">Buyers & Suppliers</button>
         <button class="nav-btn" data-page="analytics">Analytics</button>
         <button class="nav-btn" data-page="tracking">Tracking</button>
-        <button class="nav-btn" data-page="community">Community chat</button>
+        <button class="nav-btn" data-page="community">Community feed</button>
         <button class="nav-btn" data-page="checkout">Checkout</button>
       </nav>
       <div class="header-right">
@@ -110,7 +241,7 @@
             </p>
             <div class="btn-row">
               <button class="btn-primary" data-page="stock">Bekijk stock</button>
-              <button class="btn-secondary" data-page="community">Community chat</button>
+              <button class="btn-secondary" data-page="community">Community feed</button>
             </div>
             <ul class="badges">
               <li>RFID track &amp; trace</li>
@@ -264,22 +395,40 @@
         </div>
       </section>
 
-      <!-- COMMUNITY CHAT -->
+      <!-- COMMUNITY FEED -->
       <section id="community" class="page page-6">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
-            <h2>Community chat (demo)</h2>
+            <h2>Community feed</h2>
             <p>
-              Een plek waar buyers en suppliers korte updates kunnen posten: materiaalbeschikbaarheid,
-              nieuwe certificaten, levertijden, etc. Berichten in deze demo worden in je browser opgeslagen.
+              Deel updates over prijs, stock, certificaten en RFQ’s. Nieuwe gebruikers kunnen ook oudere posts zien.
             </p>
-            <div class="chat-box">
-              <div id="chat-messages" class="chat-messages"></div>
-              <form id="chat-form" class="chat-form">
-                <input type="text" id="chat-input" placeholder="Deel een update of vraag..." required>
-                <button type="submit" class="btn-primary">Verstuur</button>
-              </form>
+
+            <div class="community-layout">
+              <aside class="community-sidebar">
+                <h3>Groepen</h3>
+                <ul id="group-list" class="group-list">
+                  <!-- knoppen worden via script.js gevuld -->
+                </ul>
+              </aside>
+
+              <div class="community-main">
+                <form id="post-form" class="post-form">
+                  <label for="post-text" style="font-size:0.8rem; color:#9ca3af;">
+                    Plaats een update in <span id="current-group-name">groep</span>
+                  </label>
+                  <textarea id="post-text" placeholder="Bijv. 'Nieuwe batch T700 prepreg beschikbaar, prijsupdate €23,90/kg...'"></textarea>
+                  <div class="post-form-footer">
+                    <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.xlsx,.xls,.csv" />
+                    <button type="submit" class="btn-primary" style="width:auto;padding:6px 16px;">Plaatsen</button>
+                  </div>
+                </form>
+
+                <div id="post-feed" class="post-feed">
+                  <!-- posts uit Firestore -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -374,6 +523,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
   <script>
     const firebaseConfig = {
