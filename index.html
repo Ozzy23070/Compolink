@@ -5,10 +5,11 @@
   <title>CompoLink Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- JOUW EIGEN STYLES: hiermee komen je oude achtergrond + layout terug -->
+  <!-- JOUW EIGEN STYLES => hier zit je achtergrond / blur / layout / logo in -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <!-- AUTH WRAPPER (LOGIN + SIGNUP) -->
   <div id="auth-wrapper" class="auth-wrapper">
     <div class="auth-bg"></div>
@@ -18,7 +19,7 @@
         <p class="auth-subtitle">Your digital marketplace for composite materials</p>
       </div>
 
-      <!-- Tabs bovenin -->
+      <!-- tabs bovenin -->
       <div class="auth-tabs">
         <button id="login-tab" class="auth-tab active">Inloggen</button>
         <button id="signup-tab" class="auth-tab">Account aanmaken</button>
@@ -38,7 +39,7 @@
         <button type="submit" class="btn-primary auth-btn">Inloggen</button>
       </form>
 
-      <!-- SIGNUP FORM (slechts 1x!) -->
+      <!-- SIGNUP FORM -->
       <form id="signup-form" class="auth-form hidden">
         <p class="auth-note">
           Maak een demo-account. Je gegevens worden opgeslagen in Firebase (CompoLink-112 project).
@@ -56,9 +57,9 @@
           <input type="password" id="signup-password" name="password" placeholder="Kies een wachtwoord" required>
         </label>
 
-        <!-- Rol kiezen -->
-        <fieldset class="auth-role">
-          <legend>Accounttype</legend>
+        <!-- GEEN fieldset meer om die lelijke rand weg te halen -->
+        <label>Accounttype</label>
+        <div class="auth-role">
           <label>
             <input type="radio" name="signup-role" value="buyer" checked>
             Koper (buyer)
@@ -67,7 +68,7 @@
             <input type="radio" name="signup-role" value="supplier">
             Verkoper (supplier)
           </label>
-        </fieldset>
+        </div>
 
         <p id="signup-error" class="error-msg"></p>
         <button type="submit" class="btn-primary auth-btn">Account aanmaken</button>
@@ -375,7 +376,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase config – jouw project
     const firebaseConfig = {
       apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
       authDomain: "compolink-112.firebaseapp.com",
@@ -388,7 +388,6 @@
     firebase.initializeApp(firebaseConfig);
   </script>
 
-  <!-- Chart.js + hoofdscript -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
