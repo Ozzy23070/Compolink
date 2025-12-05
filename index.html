@@ -1,145 +1,812 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>CompoLink Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-dark: #020617;
+      --card-bg: rgba(15, 23, 42, 0.96);
+      --card-border: rgba(148, 163, 184, 0.45);
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #fca5a5;
+      --shadow-strong: 0 24px 60px rgba(15, 23, 42, 0.9);
+      --radius-lg: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .bg-blur {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.85), transparent 55%);
+      backdrop-filter: blur(14px);
+      z-index: -1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ===================== AUTH ===================== */
+
+    .auth-wrapper {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 40;
+    }
+
+    .auth-card {
+      width: 420px;
+      max-width: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.22), transparent 60%),
+        var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 28px 28px 26px;
+      box-shadow:
+        var(--shadow-strong),
+        0 0 0 1px var(--card-border);
+    }
+
+    .auth-header {
+      margin-bottom: 18px;
+    }
+
+    .auth-logo {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .auth-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.94);
+      border-radius: 999px;
+      padding: 4px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      margin-bottom: 10px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 6px 0;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .auth-tab.active {
+      background: var(--accent);
+      color: #f9fafb;
+      box-shadow: 0 18px 35px rgba(37, 99, 235, 0.8);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .auth-form label {
+      font-size: 0.84rem;
+      color: #d1d5db;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .auth-input {
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 9px 11px;
+      color: #f9fafb;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.16s ease;
+    }
+
+    .auth-input::placeholder {
+      color: #6b7280;
+    }
+
+    .auth-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .auth-role {
+      margin-top: 2px;
+      border-radius: 12px;
+      border: 1px solid rgba(75, 85, 99, 0.95);
+      padding: 8px 10px 6px;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .auth-role legend {
+      font-size: 0.8rem;
+      color: #d1d5db;
+      padding: 0 4px;
+    }
+
+    .auth-role label {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 0.86rem;
+      color: var(--text-main);
+    }
+
+    .auth-role input[type="radio"] {
+      accent-color: var(--accent);
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-primary {
+      margin-top: 4px;
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      padding: 9px 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #f9fafb;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: 0 20px 36px rgba(37, 99, 235, 0.7);
+      transition: all 0.16s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 24px 44px rgba(37, 99, 235, 0.85);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.75);
+    }
+
+    .auth-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .error-msg {
+      min-height: 16px;
+      font-size: 0.82rem;
+      color: var(--danger);
+      margin-top: 2px;
+    }
+
+    .helper {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ===================== APP ===================== */
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98)),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.98), #020617);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .top-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(31, 41, 55, 0.9);
+      border-color: rgba(55, 65, 81, 0.9);
+      color: #e5e7eb;
+    }
+
+    .nav-btn.active {
+      background: var(--accent);
+      color: #f9fafb;
+      border-color: transparent;
+      box-shadow: 0 18px 34px rgba(37, 99, 235, 0.8);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    .user-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(31, 41, 55, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      padding: 5px 12px;
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(31, 41, 55, 0.9);
+    }
+
+    .pages {
+      flex: 1;
+      padding: 24px 32px 18px;
+      position: relative;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .active-page {
+      display: block;
+    }
+
+    .page-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.5), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(8, 47, 73, 0.5), transparent 55%);
+      z-index: -1;
+    }
+
+    .page-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 20px;
+      padding: 18px 20px 18px;
+      border: 1px solid rgba(30, 64, 175, 0.65);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.9);
+    }
+
+    .card.wide {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .card.hero-card {
+      max-width: 640px;
+      margin: 0 auto;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.32), transparent 60%),
+        rgba(15, 23, 42, 0.98);
+    }
+
+    .hero-card h1 {
+      font-size: 1.7rem;
+      margin-bottom: 8px;
+    }
+
+    .hero-card p {
+      font-size: 0.95rem;
+      color: #d1d5db;
+      margin-bottom: 8px;
+    }
+
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.23em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(31, 41, 55, 0.96);
+    }
+
+    .badges {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 0.8rem;
+    }
+
+    .badges li {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .table-wrapper {
+      margin-top: 14px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    th,
+    td {
+      padding: 7px 8px;
+      text-align: left;
+      border-bottom: 1px solid rgba(30, 64, 175, 0.45);
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .btn-small {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: rgba(37, 99, 235, 0.12);
+      color: #bfdbfe;
+      border: 1px solid rgba(37, 99, 235, 0.6);
+      transition: all 0.15s ease;
+    }
+
+    .btn-small:hover {
+      background: rgba(37, 99, 235, 0.25);
+    }
+
+    .cart-summary {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(55, 65, 81, 0.85);
+      font-size: 0.9rem;
+    }
+
+    #cart-items {
+      list-style: none;
+      margin: 6px 0;
+      padding-left: 0;
+    }
+
+    #cart-items li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.86rem;
+      padding: 3px 0;
+    }
+
+    .small-note {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .checklist {
+      list-style: none;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .checklist li::before {
+      content: "•";
+      margin-right: 6px;
+      color: #22c55e;
+    }
+
+    .checklist li {
+      margin-bottom: 6px;
+    }
+
+    .chart-wrapper {
+      margin-top: 14px;
+      max-width: 620px;
+    }
+
+    .mock-map {
+      margin-top: 10px;
+      position: relative;
+      height: 160px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      overflow: hidden;
+    }
+
+    .route {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 50%;
+      height: 2px;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(96, 165, 250, 0.9),
+        rgba(96, 165, 250, 0.9) 10px,
+        transparent 10px,
+        transparent 18px
+      );
+    }
+
+    .dot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 3px 6px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(148, 163, 184, 0.9);
+    }
+
+    .dot-start {
+      left: 12%;
+      top: 50%;
+    }
+
+    .dot-end {
+      right: 4%;
+      left: auto;
+      top: 50%;
+      transform: translate(50%, -50%);
+    }
+
+    .truck {
+      position: absolute;
+      left: 30%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.4rem;
+    }
+
+    .chat-box {
+      margin-top: 10px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 8px;
+      max-height: 320px;
+    }
+
+    .chat-messages {
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      padding: 8px 10px;
+      overflow-y: auto;
+      font-size: 0.86rem;
+    }
+
+    .chat-message {
+      margin-bottom: 6px;
+    }
+
+    .chat-message span {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      margin-right: 4px;
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-form input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 8px 12px;
+      color: #f9fafb;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.16s ease;
+    }
+
+    .chat-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .chat-form .btn-primary {
+      width: auto;
+      padding: 8px 14px;
+      margin-top: 0;
+      box-shadow: none;
+    }
+
+    .chat-form .btn-primary:hover {
+      box-shadow: 0 14px 24px rgba(37, 99, 235, 0.8);
+    }
+
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    .checkout-left form label {
+      font-size: 0.86rem;
+      color: #d1d5db;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .checkout-left input,
+    .checkout-left select {
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 8px 10px;
+      color: #f9fafb;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.16s ease;
+    }
+
+    .checkout-left input:focus,
+    .checkout-left select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .checkout-right {
+      border-radius: 16px;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      background: rgba(15, 23, 42, 0.98);
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 4px 0;
+    }
+
+    .summary-line.total {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(55, 65, 81, 0.9);
+      font-weight: 600;
+    }
+
+    .app-footer {
+      padding: 10px 32px 14px;
+      border-top: 1px solid rgba(31, 41, 55, 0.95);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    @media (max-width: 900px) {
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .pages {
+        padding: 18px 16px 14px;
+      }
+      .card.hero-card {
+        margin-top: 6px;
+      }
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Firebase SDK's via script tags -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <div class="bg-blur"></div>
 
-  <script>
-    // JOUW FIREBASE CONFIG HIER
-const firebaseConfig = {
-    apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-    authDomain: "compolink-112.firebaseapp.com",
-    projectId: "compolink-112",
-    storageBucket: "compolink-112.firebasestorage.app",
-    messagingSenderId: "1045338539276",
-    appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-    measurementId: "G-VF4TTS8CJD"
-    };
-
-    // App starten
-    firebase.initializeApp(firebaseConfig);
-  </script>
-
-  <!-- Chart.js + jouw hoofdscript -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
-
-  <!-- AUTH WRAPPER (LOGIN + SIGNUP) -->
+  <!-- AUTH WRAPPER -->
   <div id="auth-wrapper" class="auth-wrapper">
-    <div class="auth-bg"></div>
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">CompoLink</div>
         <p class="auth-subtitle">Your digital marketplace for composite materials</p>
       </div>
 
-    <!-- tabs bovenin -->
-<div class="auth-tabs">
-  <button id="login-tab" class="auth-tab active">Inloggen</button>
-  <button id="signup-tab" class="auth-tab">Account aanmaken</button>
-</div>
+      <div class="auth-tabs">
+        <button id="login-tab" class="auth-tab active">Inloggen</button>
+        <button id="signup-tab" class="auth-tab">Account aanmaken</button>
+      </div>
 
-<!-- LOGIN FORM -->
-<form id="login-form" class="auth-form">
-  <label>
-    E-mail
-    <input type="email" id="login-email" required />
-  </label>
-  <label>
-    Wachtwoord
-    <input type="password" id="login-password" required />
-  </label>
-  <button type="submit">Inloggen</button>
-</form>
-
-<!-- SIGNUP FORM -->
-<form id="signup-form" class="auth-form hidden">
-  <label>
-    Naam
-    <input type="text" id="signup-name" required />
-  </label>
-  <label>
-    E-mail
-    <input type="email" id="signup-email" required />
-  </label>
-  <label>
-    Wachtwoord
-    <input type="password" id="signup-password" required />
-  </label>
-
-  <!-- NIEUW: rol kiezen -->
-  <fieldset class="auth-role">
-    <legend>Accounttype</legend>
-    <label>
-      <input type="radio" name="signup-role" value="buyer" checked />
-      Koper (buyer)
-    </label>
-    <label>
-      <input type="radio" name="signup-role" value="supplier" />
-      Verkoper (supplier)
-    </label>
-  </fieldset>
-
-  <button type="submit">Account aanmaken</button>
-</form>
-
-
-      <!-- SIGNUP FORM -->
-      <form id="signup-form" class="auth-form hidden">
-        <p class="auth-note">
-          Maak een demo-account. Je gegevens worden alleen lokaal in je browser opgeslagen.
-        </p>
-        <label>
-          Naam
-          <input type="text" name="name" placeholder="Jouw naam" required>
-        </label>
+      <!-- LOGIN -->
+      <form id="login-form" class="auth-form">
         <label>
           E-mail
-          <input type="email" name="email" placeholder="jij@bedrijf.com" required>
+          <input type="email" id="login-email" class="auth-input" placeholder="jij@bedrijf.com" required />
         </label>
         <label>
           Wachtwoord
-          <input type="password" name="password" placeholder="Kies een wachtwoord" required>
+          <input type="password" id="login-password" class="auth-input" placeholder="Je wachtwoord" required />
         </label>
-        <button type="submit" class="btn-primary auth-btn">Account aanmaken</button>
+        <p id="login-error" class="error-msg"></p>
+        <button type="submit" class="btn-primary">Inloggen</button>
+        <p class="helper">Nog geen account? Klik hierboven op <strong>Account aanmaken</strong>.</p>
+      </form>
+
+      <!-- SIGNUP -->
+      <form id="signup-form" class="auth-form hidden">
+        <p class="auth-note">
+          Maak een demo-account. Je gegevens worden opgeslagen in Firebase (CompoLink-112 project).
+        </p>
+        <label>
+          Naam
+          <input type="text" id="signup-name" class="auth-input" placeholder="Jouw naam" required />
+        </label>
+        <label>
+          E-mail
+          <input type="email" id="signup-email" class="auth-input" placeholder="jij@bedrijf.com" required />
+        </label>
+        <label>
+          Wachtwoord
+          <input type="password" id="signup-password" class="auth-input" placeholder="Kies een wachtwoord" required />
+        </label>
+
+        <fieldset class="auth-role">
+          <legend>Accounttype</legend>
+          <label>
+            <input type="radio" name="signup-role" value="buyer" checked />
+            Koper (buyer)
+          </label>
+          <label>
+            <input type="radio" name="signup-role" value="supplier" />
+            Verkoper (supplier)
+          </label>
+        </fieldset>
+
         <p id="signup-error" class="error-msg"></p>
+        <button type="submit" class="btn-primary">Account aanmaken</button>
       </form>
     </div>
   </div>
 
-  <!-- HOOFD APP – ZICHTBAAR NA LOGIN -->
+  <!-- APP -->
   <div id="app" class="app hidden">
     <header class="app-header">
       <div class="logo">CompoLink</div>
       <nav class="top-nav">
         <button class="nav-btn active" data-page="overview">Overview</button>
         <button class="nav-btn" data-page="stock">Stock</button>
-        <button class="nav-btn" data-page="buyers">Buyers & Suppliers</button>
+        <button class="nav-btn" data-page="buyers">Buyers &amp; Suppliers</button>
         <button class="nav-btn" data-page="analytics">Analytics</button>
         <button class="nav-btn" data-page="tracking">Tracking</button>
         <button class="nav-btn" data-page="community">Community chat</button>
         <button class="nav-btn" data-page="checkout">Checkout</button>
       </nav>
       <div class="header-right">
-        <span class="user-tag" id="user-tag">Demo user</span>
+        <span id="user-tag" class="user-tag">Demo user</span>
         <button id="logout-btn" class="btn-ghost">Log uit</button>
       </div>
     </header>
 
     <main class="pages">
       <!-- OVERVIEW -->
-      <section id="overview" class="page page-1 active-page">
+      <section id="overview" class="page active-page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card hero-card">
@@ -165,7 +832,7 @@ const firebaseConfig = {
       </section>
 
       <!-- STOCK -->
-      <section id="stock" class="page page-2">
+      <section id="stock" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
@@ -236,7 +903,7 @@ const firebaseConfig = {
       </section>
 
       <!-- BUYERS & SUPPLIERS -->
-      <section id="buyers" class="page page-3">
+      <section id="buyers" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card two-cols">
@@ -263,7 +930,7 @@ const firebaseConfig = {
       </section>
 
       <!-- ANALYTICS -->
-      <section id="analytics" class="page page-4">
+      <section id="analytics" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
@@ -283,11 +950,11 @@ const firebaseConfig = {
       </section>
 
       <!-- TRACKING -->
-      <section id="tracking" class="page page-5">
+      <section id="tracking" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card">
-            <h2>Tracking & logistiek</h2>
+            <h2>Tracking &amp; logistiek</h2>
             <p>
               Elke zending krijgt een uniek RFID-ID. CompoLink koppelt deze aan logistieke partners zodat
               buyers realtime de status kunnen volgen: van supplier hub naar productieplant.
@@ -307,7 +974,7 @@ const firebaseConfig = {
       </section>
 
       <!-- COMMUNITY CHAT -->
-      <section id="community" class="page page-6">
+      <section id="community" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
@@ -319,7 +986,7 @@ const firebaseConfig = {
             <div class="chat-box">
               <div id="chat-messages" class="chat-messages"></div>
               <form id="chat-form" class="chat-form">
-                <input type="text" id="chat-input" placeholder="Deel een update of vraag..." required>
+                <input type="text" id="chat-input" placeholder="Deel een update of vraag..." required />
                 <button type="submit" class="btn-primary">Verstuur</button>
               </form>
             </div>
@@ -327,12 +994,12 @@ const firebaseConfig = {
         </div>
       </section>
 
-      <!-- CHECKOUT + VERZENDKOSTEN -->
-      <section id="checkout" class="page page-7">
+      <!-- CHECKOUT -->
+      <section id="checkout" class="page">
         <div class="page-overlay"></div>
         <div class="page-content">
           <div class="card wide">
-            <h2>Checkout & verzendkosten (demo)</h2>
+            <h2>Checkout &amp; verzendkosten (demo)</h2>
             <p>
               Deze demo toont hoe verzendkosten automatisch kunnen worden berekend op basis van
               bestemming en totaalgewicht. Tarieven zijn benaderingen geïnspireerd op PostNL,
@@ -345,23 +1012,23 @@ const firebaseConfig = {
                 <form id="shipping-form">
                   <label>
                     Naam
-                    <input type="text" id="ship-name" placeholder="Naam ontvanger" required>
+                    <input type="text" id="ship-name" placeholder="Naam ontvanger" required />
                   </label>
                   <label>
                     E-mail
-                    <input type="email" id="ship-email" placeholder="ontvanger@bedrijf.com" required>
+                    <input type="email" id="ship-email" placeholder="ontvanger@bedrijf.com" required />
                   </label>
                   <label>
                     Adres
-                    <input type="text" id="ship-address" placeholder="Straat + huisnummer" required>
+                    <input type="text" id="ship-address" placeholder="Straat + huisnummer" required />
                   </label>
                   <label>
                     Postcode
-                    <input type="text" id="ship-zip" placeholder="Bijv. 2525 CP" required>
+                    <input type="text" id="ship-zip" placeholder="Bijv. 2525 CP" required />
                   </label>
                   <label>
                     Stad
-                    <input type="text" id="ship-city" placeholder="Den Haag" required>
+                    <input type="text" id="ship-city" placeholder="Den Haag" required />
                   </label>
                   <label>
                     Land / regio
@@ -373,7 +1040,7 @@ const firebaseConfig = {
                   </label>
                   <label>
                     Totaal gewicht (kg)
-                    <input type="number" id="ship-weight" min="0" step="0.1" placeholder="Wordt automatisch ingevuld" required>
+                    <input type="number" id="ship-weight" min="0" step="0.1" placeholder="Wordt automatisch ingevuld" required />
                   </label>
 
                   <button type="submit" class="btn-primary">Bereken verzendkosten</button>
@@ -396,9 +1063,9 @@ const firebaseConfig = {
                 </div>
                 <p class="small-note">
                   Verzendtarieven in deze demo:
-                  <br>NL: tot 10 kg ≈ €7, daarna stapjes per 10 kg.
-                  <br>EU: hogere basisprijs, Wereld: nog hoger.
-                  <br>Voor echte koppeling is een officiële PostNL-/carrier-API nodig.
+                  <br />NL: tot 10 kg ≈ €7, daarna stapjes per 10 kg.
+                  <br />EU: hogere basisprijs, Wereld: nog hoger.
+                  <br />Voor echte koppeling is een officiële PostNL-/carrier-API nodig.
                 </p>
               </div>
             </div>
@@ -408,11 +1075,358 @@ const firebaseConfig = {
     </main>
 
     <footer class="app-footer">
-      <span>© <span id="year"></span> CompoLink – Demo voor project 4.1</span>
+      © <span id="year"></span> CompoLink – Demo voor project 4.1
     </footer>
   </div>
 
+  <!-- FIREBASE + CHART + MAIN SCRIPT -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+
+  <script>
+    // ===== Firebase config (jouw project) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
+      authDomain: "compolink-112.firebaseapp.com",
+      projectId: "compolink-112",
+      storageBucket: "compolink-112.firebasestorage.app",
+      messagingSenderId: "1045338539276",
+      appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
+      measurementId: "G-VF4TTS8CJD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const authWrapper = document.getElementById("auth-wrapper");
+      const app = document.getElementById("app");
+      const loginTab = document.getElementById("login-tab");
+      const signupTab = document.getElementById("signup-tab");
+      const loginForm = document.getElementById("login-form");
+      const signupForm = document.getElementById("signup-form");
+      const loginError = document.getElementById("login-error");
+      const signupError = document.getElementById("signup-error");
+      const userTag = document.getElementById("user-tag");
+      const logoutBtn = document.getElementById("logout-btn");
+      const yearSpan = document.getElementById("year");
+
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+
+      // ===== Tab switch =====
+      function switchTab(target) {
+        if (target === "login") {
+          loginTab.classList.add("active");
+          signupTab.classList.remove("active");
+          loginForm.classList.remove("hidden");
+          signupForm.classList.add("hidden");
+        } else {
+          signupTab.classList.add("active");
+          loginTab.classList.remove("active");
+          signupForm.classList.remove("hidden");
+          loginForm.classList.add("hidden");
+        }
+        loginError.textContent = "";
+        signupError.textContent = "";
+      }
+
+      loginTab.addEventListener("click", () => switchTab("login"));
+      signupTab.addEventListener("click", () => switchTab("signup"));
+
+      // ===== helper voor Firebase errors =====
+      function mapAuthError(code) {
+        switch (code) {
+          case "auth/user-not-found":
+            return "Geen account gevonden met dit e-mailadres.";
+          case "auth/wrong-password":
+            return "Onjuist wachtwoord.";
+          case "auth/invalid-email":
+            return "Ongeldig e-mailadres.";
+          case "auth/email-already-in-use":
+            return "Er bestaat al een account met dit e-mailadres.";
+          case "auth/weak-password":
+            return "Wachtwoord is te zwak (minimaal 6 tekens).";
+          default:
+            return null;
+        }
+      }
+
+      // ===== Login =====
+      loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        loginError.textContent = "";
+
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+
+        auth
+          .signInWithEmailAndPassword(email, password)
+          .catch((err) => {
+            console.error(err);
+            loginError.textContent = mapAuthError(err.code) || err.message;
+          });
+      });
+
+      // ===== Signup =====
+      signupForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        signupError.textContent = "";
+
+        const name = document.getElementById("signup-name").value.trim();
+        const email = document.getElementById("signup-email").value.trim();
+        const password = document.getElementById("signup-password").value;
+        const roleInput = document.querySelector('input[name="signup-role"]:checked');
+        const role = roleInput ? roleInput.value : null;
+
+        if (!name || !email || !password || !role) {
+          signupError.textContent = "Vul alle velden in en kies een accounttype.";
+          return;
+        }
+
+        auth
+          .createUserWithEmailAndPassword(email, password)
+          .then((cred) => {
+            return Promise.all([
+              cred.user.updateProfile({ displayName: name }),
+              db.collection("users").doc(cred.user.uid).set({
+                name,
+                email,
+                role,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              })
+            ]);
+          })
+          .then(() => {
+            signupForm.reset();
+            switchTab("login");
+            alert("Account aangemaakt! Je kunt nu inloggen.");
+          })
+          .catch((err) => {
+            console.error(err);
+            signupError.textContent = mapAuthError(err.code) || err.message;
+          });
+      });
+
+      // ===== Auth state listener =====
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          authWrapper.classList.add("hidden");
+          app.classList.remove("hidden");
+          userTag.textContent = user.displayName || user.email || "Ingelogde gebruiker";
+        } else {
+          app.classList.add("hidden");
+          authWrapper.classList.remove("hidden");
+        }
+      });
+
+      // ===== Logout =====
+      logoutBtn.addEventListener("click", () => {
+        auth.signOut().catch((err) => console.error(err));
+      });
+
+      // ===== Navigation pages =====
+      const navButtons = document.querySelectorAll(".nav-btn");
+      const pages = document.querySelectorAll(".page");
+
+      function showPage(pageId) {
+        pages.forEach((p) => p.classList.remove("active-page"));
+        const pageEl = document.getElementById(pageId);
+        if (pageEl) pageEl.classList.add("active-page");
+
+        navButtons.forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.page === pageId);
+        });
+      }
+
+      navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => showPage(btn.dataset.page));
+      });
+
+      // Buttons inside hero card that navigate
+      document.querySelectorAll("[data-page]").forEach((btn) => {
+        if (!btn.classList.contains("nav-btn")) {
+          btn.addEventListener("click", () => showPage(btn.dataset.page));
+        }
+      });
+
+      // ===== Chart (Analytics) =====
+      const chartCanvas = document.getElementById("stockChart");
+      if (chartCanvas) {
+        new Chart(chartCanvas.getContext("2d"), {
+          type: "doughnut",
+          data: {
+            labels: ["Carbon prepreg", "Epoxy hars", "Glass fabric"],
+            datasets: [
+              {
+                data: [1500, 3200, 7800],
+                backgroundColor: ["#3b82f6", "#22c55e", "#f97316"]
+              }
+            ]
+          },
+          options: {
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#e5e7eb",
+                  font: { size: 12 }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // ===== Cart logic =====
+      const cartItemsEl = document.getElementById("cart-items");
+      const cartEmptyMsg = document.getElementById("cart-empty-msg");
+      const cartWeightEl = document.getElementById("cart-weight");
+      const cartTotalEl = document.getElementById("cart-total");
+      const summaryMaterialEl = document.getElementById("summary-material");
+      const shipWeightInput = document.getElementById("ship-weight");
+
+      const cart = [];
+
+      function updateCartUI() {
+        if (!cartItemsEl) return;
+        cartItemsEl.innerHTML = "";
+        if (cart.length === 0) {
+          if (cartEmptyMsg) cartEmptyMsg.classList.remove("hidden");
+          cartWeightEl.textContent = "0";
+          cartTotalEl.textContent = "0.00";
+          if (summaryMaterialEl) summaryMaterialEl.textContent = "0.00";
+          if (shipWeightInput) shipWeightInput.value = "";
+          return;
+        }
+        if (cartEmptyMsg) cartEmptyMsg.classList.add("hidden");
+
+        let totalWeight = 0;
+        let totalPrice = 0;
+
+        cart.forEach((item) => {
+          totalWeight += item.weight;
+          totalPrice += item.price * (item.weight / item.baseWeight);
+
+          const li = document.createElement("li");
+          li.textContent = `${item.name} – ${item.weight} kg`;
+          cartItemsEl.appendChild(li);
+        });
+
+        cartWeightEl.textContent = totalWeight.toFixed(1);
+        cartTotalEl.textContent = totalPrice.toFixed(2);
+        if (summaryMaterialEl) summaryMaterialEl.textContent = totalPrice.toFixed(2);
+        if (shipWeightInput) shipWeightInput.value = totalWeight.toFixed(1);
+      }
+
+      document.querySelectorAll(".add-to-cart").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const row = btn.closest("tr");
+          if (!row) return;
+          const data = row.getAttribute("data-item");
+          if (!data) return;
+          const parsed = JSON.parse(data);
+          cart.push({
+            id: parsed.id,
+            name: parsed.name,
+            price: parsed.price,
+            weight: parsed.weight,
+            baseWeight: parsed.weight
+          });
+          updateCartUI();
+        });
+      });
+
+      // ===== Community chat (localStorage) =====
+      const chatMessagesEl = document.getElementById("chat-messages");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+      const CHAT_KEY = "compolink_demo_chat";
+
+      function loadChat() {
+        if (!chatMessagesEl) return;
+        const stored = localStorage.getItem(CHAT_KEY);
+        const msgs = stored ? JSON.parse(stored) : [];
+        chatMessagesEl.innerHTML = "";
+        msgs.forEach((m) => appendChatMessage(m));
+      }
+
+      function appendChatMessage(message) {
+        if (!chatMessagesEl) return;
+        const div = document.createElement("div");
+        div.className = "chat-message";
+        const time = new Date(message.time).toLocaleTimeString("nl-NL", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+        div.innerHTML = `<span>[${time}]</span>${message.text}`;
+        chatMessagesEl.appendChild(div);
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+      }
+
+      if (chatForm && chatInput) {
+        loadChat();
+        chatForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = chatInput.value.trim();
+          if (!text) return;
+          const stored = localStorage.getItem(CHAT_KEY);
+          const msgs = stored ? JSON.parse(stored) : [];
+          const message = { text, time: Date.now() };
+          msgs.push(message);
+          localStorage.setItem(CHAT_KEY, JSON.stringify(msgs));
+          appendChatMessage(message);
+          chatInput.value = "";
+        });
+      }
+
+      // ===== Shipping cost =====
+      const shippingForm = document.getElementById("shipping-form");
+      const summaryShippingEl = document.getElementById("summary-shipping");
+      const summaryTotalEl = document.getElementById("summary-total");
+
+      function calcShipping(region, weight) {
+        weight = Number(weight) || 0;
+        if (weight <= 0) return 0;
+
+        let base, step, perStep;
+        if (region === "NL") {
+          base = 7;
+          step = 10;
+          perStep = 4;
+        } else if (region === "EU") {
+          base = 14;
+          step = 10;
+          perStep = 7;
+        } else {
+          base = 24;
+          step = 10;
+          perStep = 9;
+        }
+        if (weight <= step) return base;
+        const extraSteps = Math.ceil((weight - step) / step);
+        return base + extraSteps * perStep;
+      }
+
+      if (shippingForm) {
+        shippingForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const region = document.getElementById("ship-region").value;
+          const weight = document.getElementById("ship-weight").value;
+          const material = Number(summaryMaterialEl.textContent.replace(",", ".")) || 0;
+
+          const shipping = calcShipping(region, weight);
+          if (summaryShippingEl) summaryShippingEl.textContent = shipping.toFixed(2);
+          if (summaryTotalEl) summaryTotalEl.textContent = (material + shipping).toFixed(2);
+        });
+      }
+
+      // start with empty cart UI correct
+      updateCartUI();
+    });
+  </script>
 </body>
 </html>
