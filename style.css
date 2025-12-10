@@ -14,11 +14,10 @@ body {
   color: #e5e7eb;
 }
 
-/* achtergrond */
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(37, 99, 235, 0.25), transparent 55%),
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.25), transparent 50%),
     radial-gradient(circle at bottom, rgba(8, 47, 73, 0.6), #020617 60%);
 }
 
@@ -150,10 +149,6 @@ textarea::placeholder {
   background: #1d4ed8;
 }
 
-.full-width {
-  width: 100%;
-}
-
 .ghost-btn {
   border-radius: 9999px;
   border: 1px solid #64748b;
@@ -174,7 +169,7 @@ textarea::placeholder {
   flex-direction: column;
 }
 
-/* top nav */
+/* top nav (oude layout stijl) */
 .top-nav {
   display: flex;
   align-items: center;
@@ -182,7 +177,7 @@ textarea::placeholder {
   padding: 0.8rem 2.5rem;
   background: rgba(15, 23, 42, 0.98);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.8);
 }
 
 .nav-left {
@@ -243,72 +238,11 @@ textarea::placeholder {
   background: rgba(15, 23, 42, 0.9);
 }
 
-/* ===== LIVE MARKET STRIP ===== */
-
-.market-strip {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 0.4rem 2.5rem;
-  background: rgba(15, 23, 42, 0.98);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
-  font-size: 0.8rem;
-}
-
-.market-strip-label {
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #9ca3af;
-}
-
-.market-prices-strip {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  gap: 1.2rem;
-}
-
-.market-strip-note {
-  margin-left: auto;
-  color: #9ca3af;
-}
-
-/* ===== MAIN ===== */
+/* main wrapper */
 
 .main-wrapper {
   flex: 1;
-  padding: 2.5rem 2.5rem 3rem;
-}
-
-.page {
-  display: none;
-}
-
-.page.active-page {
-  display: block;
-}
-
-h2 {
-  margin: 0 0 0.4rem;
-  font-size: 1.3rem;
-}
-
-h3 {
-  margin: 0.1rem 0 0.4rem;
-  font-size: 1.05rem;
-}
-
-.page-intro {
-  margin: 0 0 1.1rem;
-  font-size: 0.92rem;
-  color: #9ca3af;
-}
-
-.muted {
-  font-size: 0.85rem;
-  color: #9ca3af;
+  padding: 3.5rem 2.5rem 3rem;
 }
 
 /* ===== HERO OVERVIEW ===== */
@@ -372,13 +306,35 @@ h3 {
   color: #e5e7eb;
 }
 
-/* ===== GENERIC CARD ===== */
+/* ===== PAGES ===== */
 
-.card {
-  border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid rgba(30, 64, 175, 0.45);
-  padding: 1rem 1.2rem;
+.page {
+  display: none;
+}
+
+.page.active-page {
+  display: block;
+}
+
+h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.3rem;
+}
+
+h3 {
+  margin: 0.1rem 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.page-intro {
+  margin: 0 0 1.1rem;
+  font-size: 0.92rem;
+  color: #9ca3af;
+}
+
+.muted {
+  font-size: 0.85rem;
+  color: #9ca3af;
 }
 
 /* ===== STOCK PAGE ===== */
@@ -396,6 +352,10 @@ h3 {
   background: rgba(15, 23, 42, 0.96);
   border: 1px solid rgba(30, 64, 175, 0.45);
   padding: 1rem 1.2rem;
+}
+
+.prices-panel h3 {
+  margin-bottom: 0.4rem;
 }
 
 .market-prices-list {
@@ -489,6 +449,15 @@ h3 {
   padding: 0.2rem 0;
 }
 
+/* ===== GENERIC CARD ===== */
+
+.card {
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(30, 64, 175, 0.45);
+  padding: 1rem 1.2rem;
+}
+
 /* ===== ANALYTICS ===== */
 
 .chart-wrapper {
@@ -503,24 +472,10 @@ h3 {
 
 /* ===== COMMUNITY ===== */
 
-.community-shell {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.community-card {
-  border-radius: 1.5rem;
-  background: radial-gradient(circle at top, #1e293b, #020617 60%);
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  padding: 1.8rem 2rem 1.8rem;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.65);
-}
-
 .community-layout {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 1.5rem;
-  margin-top: 0.8rem;
 }
 
 .community-sidebar {
@@ -570,11 +525,16 @@ h3 {
   border: 1px solid rgba(31, 41, 55, 0.9);
   padding: 0.75rem 0.9rem;
   background: rgba(15, 23, 42, 0.96);
-  max-height: 260px;
+  max-height: 340px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+
+.post-empty {
+  font-size: 0.85rem;
+  color: #9ca3af;
 }
 
 .post-card {
@@ -636,24 +596,10 @@ h3 {
 
 /* ===== CHECKOUT ===== */
 
-.checkout-shell {
-  max-width: 1150px;
-  margin: 0 auto;
-}
-
-.checkout-card {
-  border-radius: 1.5rem;
-  background: radial-gradient(circle at top, #0f172a, #020617 65%);
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  padding: 2rem 2.3rem 2rem;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
-}
-
-.checkout-grid {
+.checkout-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 1.8rem;
-  margin-top: 1rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 1.5rem;
 }
 
 .shipping-form {
@@ -662,27 +608,8 @@ h3 {
   gap: 0.8rem;
 }
 
-.summary-lines p {
-  display: flex;
-  justify-content: space-between;
-  margin: 0.15rem 0;
-  font-size: 0.92rem;
-}
-
-.summary-lines hr {
-  border: none;
-  border-top: 1px solid #1f2937;
-  margin: 0.5rem 0;
-}
-
-.summary-total-row {
-  font-weight: 600;
-}
-
-.summary-text {
-  margin-top: 0.7rem;
-  font-size: 0.85rem;
-  color: #9ca3af;
+.summary-card p {
+  margin: 0.2rem 0;
 }
 
 /* ===== FOOTER ===== */
@@ -711,7 +638,7 @@ h3 {
   }
 
   .stock-layout,
-  .checkout-grid,
+  .checkout-layout,
   .community-layout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -721,10 +648,6 @@ h3 {
     border-bottom: 1px solid rgba(31, 41, 55, 0.9);
     padding-bottom: 0.7rem;
     margin-bottom: 0.6rem;
-  }
-
-  .market-strip {
-    padding-inline: 1.25rem;
   }
 }
 
@@ -744,15 +667,5 @@ h3 {
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .market-strip {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.3rem;
-  }
-
-  .market-strip-note {
-    margin-left: 0;
   }
 }
