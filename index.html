@@ -83,7 +83,7 @@
 
   <!-- ============ APP (NA INLOGGEN) ============ -->
   <div id="app" class="app hidden">
-    <!-- TOP NAV (zoals oude layout) -->
+    <!-- TOP NAV (oude layout-stijl) -->
     <header class="top-nav">
       <div class="nav-left">
         <span class="nav-logo">CompoLink</span>
@@ -103,8 +103,17 @@
       </div>
     </header>
 
+    <!-- GLOBAL LIVE KOERSEN STRIP (zichtbaar op alle tabs behalve Checkout) -->
+    <div id="market-strip" class="market-strip">
+      <span class="market-strip-label">Live material prices</span>
+      <ul id="market-prices-strip" class="market-prices-strip"></ul>
+      <span class="market-strip-note">
+        Indicatieve spotprijzen (goud, zilver, etc.) in USD.
+      </span>
+    </div>
+
     <main class="main-wrapper">
-      <!-- ===== OVERVIEW (hero card zoals oude screenshot) ===== -->
+      <!-- ===== OVERVIEW: HERO CARD ===== -->
       <section id="overview" class="page active-page">
         <div class="hero-shell">
           <div class="hero-card">
@@ -140,7 +149,7 @@
         </div>
       </section>
 
-      <!-- ===== STOCK PAGE ===== -->
+      <!-- ===== STOCK PAGE (met live card links + tabel + mini-cart) ===== -->
       <section id="stock" class="page">
         <h2>Stock overview</h2>
         <p class="page-intro">
@@ -149,13 +158,13 @@
         </p>
 
         <div class="stock-layout">
-          <!-- Live koersen links -->
+          <!-- Live koersen card -->
           <aside class="prices-panel">
             <h3>Live material prices</h3>
-            <ul id="market-prices" class="market-prices-list"></ul>
+            <ul id="market-prices-card" class="market-prices-list"></ul>
             <p class="market-note">
               Indicatieve spotprijzen (goud, zilver, etc.) in USD. Automatisch
-              ververst.
+              ververst (demo).
             </p>
           </aside>
 
@@ -226,13 +235,15 @@
         </div>
       </section>
 
-      <!-- ===== BUYERS & SUPPLIERS (placeholder) ===== -->
+      <!-- ===== BUYERS & SUPPLIERS ===== -->
       <section id="buyers" class="page">
-        <h2>Buyers &amp; Suppliers</h2>
-        <p class="page-intro">
-          Hier kun je later supplier-profielen, certificaten en matching
-          logica tonen. Voor nu is dit een placeholder.
-        </p>
+        <div class="card">
+          <h2>Buyers &amp; Suppliers</h2>
+          <p class="page-intro">
+            Hier kun je later supplier-profielen, certificaten en matching
+            logica tonen. Voor nu is dit een nette placeholder.
+          </p>
+        </div>
       </section>
 
       <!-- ===== ANALYTICS ===== -->
@@ -248,100 +259,174 @@
         </div>
       </section>
 
-      <!-- ===== TRACKING (placeholder) ===== -->
+      <!-- ===== TRACKING ===== -->
       <section id="tracking" class="page">
-        <h2>Tracking</h2>
-        <p class="page-intro">
-          Trackingpagina voor toekomstige RFID / shipment tracking. Nu nog
-          placeholder.
-        </p>
+        <div class="card">
+          <h2>Tracking</h2>
+          <p class="page-intro">
+            Trackingpagina voor toekomstige RFID / shipment tracking. Nu nog
+            placeholder.
+          </p>
+        </div>
       </section>
 
-      <!-- ===== COMMUNITY FEED ===== -->
+      <!-- ===== COMMUNITY FEED (zoals screenshot) ===== -->
       <section id="community" class="page">
-        <h2>Community feed</h2>
-        <p class="page-intro">
-          LinkedIn-stijl feed voor market updates, certificaten en RFQ’s.
-        </p>
+        <div class="community-shell">
+          <div class="community-card">
+            <h2>Community feed</h2>
+            <p class="page-intro">
+              Share updates on price, stock, certificates, and RFQs. New users
+              can also see older posts.
+            </p>
 
-        <div class="community-layout">
-          <aside class="community-sidebar">
-            <h3>Groups</h3>
-            <ul id="group-list" class="group-list"></ul>
-          </aside>
+            <div class="community-layout">
+              <aside class="community-sidebar">
+                <h3>Groups</h3>
+                <ul id="group-list" class="group-list"></ul>
+              </aside>
 
-          <div class="community-main">
-            <div class="community-header">
-              <h3>Community feed: <span id="current-group-name">Market updates</span></h3>
-            </div>
+              <div class="community-main">
+                <div class="community-header">
+                  <h3>
+                    Post an update in
+                    <span id="current-group-name">Market updates</span>
+                  </h3>
+                </div>
 
-            <div id="post-feed" class="post-feed"></div>
+                <div id="post-feed" class="post-feed"></div>
 
-            <form id="post-form" class="post-form">
-              <textarea
-                id="post-text"
-                rows="3"
-                placeholder="Deel een update, vertraging of certificaat..."
-              ></textarea>
-              <div class="post-form-row">
-                <input type="file" id="post-file" />
-                <button type="submit" class="primary-btn">Plaatsen</button>
+                <form id="post-form" class="post-form">
+                  <textarea
+                    id="post-text"
+                    rows="3"
+                    placeholder="For example, 'New batch of T700 prepreg available, price update €23.90/kg...'"
+                  ></textarea>
+                  <div class="post-form-row">
+                    <input type="file" id="post-file" />
+                    <button type="submit" class="primary-btn">Plaatsen</button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- ===== CHECKOUT ===== -->
+      <!-- ===== CHECKOUT (oude layout met alle velden) ===== -->
       <section id="checkout" class="page">
-        <h2>Checkout</h2>
-        <p class="page-intro">
-          Bereken totale kosten inclusief verzendkosten op basis van gewicht en
-          regio.
-        </p>
-
-        <div class="checkout-layout">
-          <div class="card">
-            <h3>Verzendkosten</h3>
-            <form id="shipping-form" class="shipping-form">
-              <label>
-                Regio
-                <select id="ship-region">
-                  <option value="NL">Nederland</option>
-                  <option value="EU">Europa (EU)</option>
-                  <option value="WORLD">Rest van de wereld</option>
-                </select>
-              </label>
-              <label>
-                Gewicht (kg)
-                <input
-                  type="number"
-                  id="ship-weight"
-                  step="0.1"
-                  min="0"
-                  placeholder="Wordt automatisch ingevuld na shoppen"
-                />
-              </label>
-              <button type="submit" class="primary-btn">
-                Bereken totaal
-              </button>
-            </form>
-          </div>
-
-          <div class="card summary-card">
-            <h3>Samenvatting</h3>
-            <p>Materiaal: €<span id="summary-material">0.00</span></p>
-            <p>Verzending: €<span id="summary-shipping">0.00</span></p>
-            <p>
-              <strong>Totaal: €<span id="summary-total">0.00</span></strong>
+        <div class="checkout-shell">
+          <div class="checkout-card">
+            <h2>Checkout &amp; Shipping Costs (Demo)</h2>
+            <p class="page-intro">
+              This demo shows how shipping costs can be automatically
+              calculated based on destination and total weight. Rates are
+              approximations inspired by PostNL, but <strong>not live or official prices</strong>.
             </p>
+
+            <div class="checkout-grid">
+              <!-- LINKERKANT: FORM -->
+              <div class="checkout-left">
+                <h3>Shipping information</h3>
+                <form id="shipping-form" class="shipping-form">
+                  <label>
+                    Name
+                    <input
+                      type="text"
+                      id="ship-name"
+                      placeholder="Recipient name"
+                    />
+                  </label>
+                  <label>
+                    E-mail
+                    <input
+                      type="email"
+                      id="ship-email"
+                      placeholder="ontvanger@bedrijf.com"
+                    />
+                  </label>
+                  <label>
+                    Address
+                    <input
+                      type="text"
+                      id="ship-address"
+                      placeholder="Street + house number"
+                    />
+                  </label>
+                  <label>
+                    Postcode
+                    <input
+                      type="text"
+                      id="ship-postcode"
+                      placeholder="For example 2525 CP"
+                    />
+                  </label>
+                  <label>
+                    City
+                    <input
+                      type="text"
+                      id="ship-city"
+                      placeholder="The Hague"
+                    />
+                  </label>
+                  <label>
+                    Land / regio
+                    <select id="ship-region">
+                      <option value="NL">The Netherlands</option>
+                      <option value="EU">European Union</option>
+                      <option value="WORLD">Worldwide</option>
+                    </select>
+                  </label>
+                  <label>
+                    Total weight (kg)
+                    <input
+                      type="number"
+                      id="ship-weight"
+                      step="0.1"
+                      min="0"
+                      placeholder="Will be filled in automatically"
+                    />
+                  </label>
+                  <button type="submit" class="primary-btn full-width">
+                    Calculate shipping costs
+                  </button>
+                </form>
+              </div>
+
+              <!-- RECHTERKANT: SAMENVATTING -->
+              <div class="checkout-right">
+                <h3>Summary order</h3>
+                <div class="summary-lines">
+                  <p>
+                    <span>Material price</span>
+                    <span>€ <span id="summary-material">0.00</span></span>
+                  </p>
+                  <p>
+                    <span>Shipping costs (demo)</span>
+                    <span>€ <span id="summary-shipping">0.00</span></span>
+                  </p>
+                  <hr />
+                  <p class="summary-total-row">
+                    <span>Total</span>
+                    <span>€ <span id="summary-total">0.00</span></span>
+                  </p>
+                </div>
+                <p class="summary-text">
+                  Shipping rates in this demo:<br />
+                  NL: up to 10 kg ≈ €7, then increments per 10 kg.<br />
+                  EU: higher base price, Worldwide: even higher.<br />
+                  For a true integration, an official PostNL/carrier API is
+                  required.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <footer class="app-footer">
-      © <span id="year"></span> CompoLink – EU composite supply network
+      © <span id="year"></span> CompoLink – Demo for project 4.1
     </footer>
   </div>
 
@@ -353,7 +438,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- JOUW FIREBASE CONFIG (INGEVULD) -->
+  <!-- JOUW FIREBASE CONFIG -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
@@ -370,14 +455,20 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- JOUW SCRIPT.JS (de lange code die jij stuurde) -->
+  <!-- JOUW HOOFDLOGICA -->
   <script src="script.js"></script>
 
-  <!-- Live koersen voor #market-prices (met fallback) -->
+  <!-- LIVE KOERSEN: STRIP + CARD (GOLD/SILVER/...) -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const list = document.getElementById("market-prices");
-      if (!list) return;
+      const stripList = document.getElementById("market-prices-strip");
+      const cardList = document.getElementById("market-prices-card");
+
+      if (!stripList && !cardList) return;
+
+      const lists = [];
+      if (stripList) lists.push(stripList);
+      if (cardList) lists.push(cardList);
 
       const fallback = [
         { symbol: "GOLD", price: 2350 },
@@ -386,8 +477,22 @@
         { symbol: "PALLADIUM", price: 1040 }
       ];
 
+      function renderLists(items) {
+        lists.forEach((listEl) => {
+          listEl.innerHTML = "";
+          items.forEach(({ symbol, price }) => {
+            const li = document.createElement("li");
+            li.className = "market-price-item";
+            li.innerHTML = `
+              <span class="material-symbol">${symbol}</span>
+              <span class="material-price">${price.toFixed(2)} USD</span>
+            `;
+            listEl.appendChild(li);
+          });
+        });
+      }
+
       async function loadPrices() {
-        list.innerHTML = "<li>Koersen laden...</li>";
         try {
           const res = await fetch("https://api.metals.live/v1/spot");
           if (!res.ok) throw new Error("HTTP " + res.status);
@@ -406,29 +511,10 @@
           });
 
           if (!items.length) throw new Error("Geen geldige data");
-
-          list.innerHTML = "";
-          items.forEach(({ symbol, price }) => {
-            const li = document.createElement("li");
-            li.className = "market-price-item";
-            li.innerHTML = `
-              <span class="material-symbol">${symbol}</span>
-              <span class="material-price">${price.toFixed(2)} USD</span>
-            `;
-            list.appendChild(li);
-          });
+          renderLists(items);
         } catch (err) {
           console.error("Fout bij laden koersen, gebruik fallback:", err);
-          list.innerHTML = "";
-          fallback.forEach(({ symbol, price }) => {
-            const li = document.createElement("li");
-            li.className = "market-price-item";
-            li.innerHTML = `
-              <span class="material-symbol">${symbol}</span>
-              <span class="material-price">~ ${price.toFixed(2)} USD</span>
-            `;
-            list.appendChild(li);
-          });
+          renderLists(fallback);
         }
       }
 
