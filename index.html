@@ -4,20 +4,16 @@
   <meta charset="UTF-8" />
   <title>CompoLink Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <!-- Font + jouw eigen CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- AUTH WRAPPER (login / signup) -->
+  <!-- ============ AUTH SCHERM ============ -->
   <div id="auth-wrapper" class="auth-wrapper">
     <div class="auth-card">
       <h1>CompoLink</h1>
-      <p class="auth-subtitle">
-        Connect EU composite buyers &amp; suppliers in één platform.
-      </p>
+      <p class="auth-subtitle">Connect EU composite buyers & suppliers in één platform.</p>
 
       <div class="auth-tabs">
         <button id="login-tab" class="auth-tab active">Log in</button>
@@ -32,12 +28,7 @@
         </label>
         <label>
           Wachtwoord
-          <input
-            type="password"
-            id="login-password"
-            autocomplete="current-password"
-            required
-          />
+          <input type="password" id="login-password" autocomplete="current-password" required />
         </label>
         <p id="login-error" class="auth-error"></p>
         <button type="submit" class="primary-btn">Log in</button>
@@ -46,7 +37,7 @@
       <!-- SIGNUP FORM -->
       <form id="signup-form" class="auth-form hidden">
         <label>
-          Volledige naam
+          Naam
           <input type="text" id="signup-name" autocomplete="name" required />
         </label>
         <label>
@@ -55,16 +46,11 @@
         </label>
         <label>
           Wachtwoord
-          <input
-            type="password"
-            id="signup-password"
-            autocomplete="new-password"
-            required
-          />
+          <input type="password" id="signup-password" autocomplete="new-password" required />
         </label>
 
         <fieldset class="role-fieldset">
-          <legend>Rol</legend>
+          <legend>Accounttype</legend>
           <label>
             <input type="radio" name="signup-role" value="buyer" checked />
             Buyer (OEM / MRO / integrator)
@@ -81,7 +67,7 @@
     </div>
   </div>
 
-  <!-- APP (zichtbaar na inloggen) -->
+  <!-- ============ APP (NA INLOGGEN) ============ -->
   <div id="app" class="app hidden">
     <!-- TOPBAR -->
     <header class="app-header">
@@ -90,16 +76,15 @@
         <span class="logo-text">CompoLink Platform</span>
       </div>
       <div class="app-header-right">
-        <span class="user-label">
-          Ingelogd als: <strong id="user-tag">–</strong>
-        </span>
+        <span>Ingelogd als: <strong id="user-tag">–</strong></span>
         <button id="logout-btn" class="ghost-btn">Uitloggen</button>
       </div>
     </header>
 
     <div class="app-layout">
-      <!-- SIDEBAR NAV -->
+      <!-- ========== SIDEBAR (LINKER KANT) ========== -->
       <aside class="sidebar">
+        <!-- Navigatie -->
         <nav class="sidebar-nav">
           <button class="nav-btn active" data-page="overview">Overview</button>
           <button class="nav-btn" data-page="analytics">Analytics</button>
@@ -107,28 +92,29 @@
           <button class="nav-btn" data-page="checkout">Checkout</button>
         </nav>
 
-        <!-- LIVE MARKET PRICES LINKS -->
+        <!-- Live koersen blok -->
         <section class="sidebar-section">
           <h3>Live material prices</h3>
           <ul id="market-prices" class="market-prices-list">
-            <!-- JS vult dit met goud / zilver / etc. -->
+            <!-- Wordt via JS gevuld met goud/zilver etc. -->
           </ul>
           <p class="market-note">
-            Indicatieve prijzen, automatisch ververst.
+            Indicatieve spotprijzen (goud, zilver, etc.) in USD. Automatisch ververst.
           </p>
         </section>
       </aside>
 
-      <!-- MAIN CONTENT -->
+      <!-- ========== MAIN CONTENT (RECHTS) ========== -->
       <main class="main">
-        <!-- ============ OVERVIEW / STOCK ============ -->
+        <!-- ===== OVERVIEW ===== -->
         <section id="overview" class="page active-page">
           <h2>Available stock</h2>
           <p class="page-intro">
-            Snelle indruk van beschikbare composietmaterialen in het netwerk.
+            Demo-overzicht van enkele composietmaterialen in het netwerk.
           </p>
 
           <div class="overview-layout">
+            <!-- Materialen tabel -->
             <div class="stock-block">
               <h3>Material list</h3>
               <table class="stock-table">
@@ -142,67 +128,56 @@
                 </thead>
                 <tbody>
                   <tr
-                    data-item='{"name":"Carbon prepreg T700","price":38,"weight":50}'
+                    data-item='{"id":"mat-carbon","name":"Carbon prepreg T700","price":38,"weight":50}'
                   >
                     <td>Carbon prepreg T700</td>
                     <td>€38,00</td>
                     <td>1500</td>
-                    <td>
-                      <button type="button" class="add-to-cart">
-                        In mandje
-                      </button>
-                    </td>
+                    <td><button type="button" class="add-to-cart">In mandje</button></td>
                   </tr>
                   <tr
-                    data-item='{"name":"Epoxy resin system 2K","price":9.5,"weight":25}'
+                    data-item='{"id":"mat-epoxy","name":"Epoxy resin system 2K","price":9.5,"weight":25}'
                   >
                     <td>Epoxy resin system 2K</td>
                     <td>€9,50</td>
                     <td>3200</td>
-                    <td>
-                      <button type="button" class="add-to-cart">
-                        In mandje
-                      </button>
-                    </td>
+                    <td><button type="button" class="add-to-cart">In mandje</button></td>
                   </tr>
                   <tr
-                    data-item='{"name":"Glass fabric 450 g/m²","price":4.2,"weight":30}'
+                    data-item='{"id":"mat-glass","name":"Glass fabric 450 g/m²","price":4.2,"weight":30}'
                   >
                     <td>Glass fabric 450 g/m²</td>
                     <td>€4,20</td>
                     <td>7800</td>
-                    <td>
-                      <button type="button" class="add-to-cart">
-                        In mandje
-                      </button>
-                    </td>
+                    <td><button type="button" class="add-to-cart">In mandje</button></td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
+            <!-- Cart samenvatting -->
             <aside class="cart-summary">
               <h3>Mini-cart</h3>
               <ul id="cart-items" class="cart-items"></ul>
-              <p id="cart-empty-msg" class="muted">
-                Je mandje is nog leeg.
-              </p>
+              <p id="cart-empty-msg" class="muted">Je mandje is nog leeg.</p>
               <p>Totaal gewicht: <span id="cart-weight">0.0</span> kg</p>
               <p>Materiaalprijs: €<span id="cart-total">0.00</span></p>
             </aside>
           </div>
         </section>
 
-        <!-- ============ ANALYTICS ============ -->
+        <!-- ===== ANALYTICS ===== -->
         <section id="analytics" class="page">
           <h2>Analytics</h2>
           <p class="page-intro">
-            Simpel voorbeeld van volume per materiaaltype in het netwerk.
+            Eenvoudige demo van stockvolumes per materiaaltype.
           </p>
-          <canvas id="stockChart" height="150"></canvas>
+          <div class="chart-wrapper">
+            <canvas id="stockChart"></canvas>
+          </div>
         </section>
 
-        <!-- ============ COMMUNITY ============ -->
+        <!-- ===== COMMUNITY ===== -->
         <section id="community" class="page">
           <div class="community-layout">
             <aside class="community-sidebar">
@@ -212,10 +187,7 @@
 
             <div class="community-main">
               <div class="community-header">
-                <h2>
-                  Community feed:
-                  <span id="current-group-name">Market updates</span>
-                </h2>
+                <h2>Community feed: <span id="current-group-name">Market updates</span></h2>
               </div>
 
               <div id="post-feed" class="post-feed"></div>
@@ -224,31 +196,28 @@
                 <textarea
                   id="post-text"
                   rows="3"
-                  placeholder="Deel een update, RFQ, of logistiek issue..."
+                  placeholder="Deel een update, RFQ of certificaat-update..."
                 ></textarea>
                 <div class="post-form-row">
                   <input type="file" id="post-file" />
-                  <button type="submit" class="primary-btn">
-                    Plaatsen
-                  </button>
+                  <button type="submit" class="primary-btn">Plaatsen</button>
                 </div>
               </form>
             </div>
           </div>
         </section>
 
-        <!-- ============ CHECKOUT ============ -->
+        <!-- ===== CHECKOUT ===== -->
         <section id="checkout" class="page">
           <h2>Checkout</h2>
           <div class="checkout-layout">
             <div class="checkout-column">
-              <h3>Winkelmand</h3>
+              <h3>Items & materiaalprijs</h3>
               <ul id="cart-items-checkout" class="cart-items">
-                <!-- we gebruiken hetzelfde cart-model; in JS koppelen we aan zelfde UL (cart-items) -->
+                <!-- same cart-data; wordt via JS gesynchroniseerd -->
               </ul>
-              <!-- de echte items worden in de overview-sectie getoond; samenvatting hieronder -->
               <p class="muted">
-                Bovenstaande materialen zijn een demo van de platform-logica.
+                Dit is een demo van de logica voor materiaalprijs + verzendkosten.
               </p>
             </div>
 
@@ -270,22 +239,16 @@
                     id="ship-weight"
                     step="0.1"
                     min="0"
-                    placeholder="Wordt automatisch ingevuld"
+                    placeholder="Wordt automatisch ingevuld na shoppen"
                   />
                 </label>
-                <button type="submit" class="primary-btn">
-                  Bereken totaal
-                </button>
+                <button type="submit" class="primary-btn">Bereken totaal</button>
               </form>
 
               <div class="summary-box">
                 <p>Materiaal: €<span id="summary-material">0.00</span></p>
                 <p>Verzending: €<span id="summary-shipping">0.00</span></p>
-                <p>
-                  <strong>
-                    Totaal: €<span id="summary-total">0.00</span>
-                  </strong>
-                </p>
+                <p><strong>Totaal: €<span id="summary-total">0.00</span></strong></p>
               </div>
             </div>
           </div>
@@ -298,9 +261,7 @@
     </footer>
   </div>
 
-  <!-- =========================
-       SCRIPTS
-       ========================= -->
+  <!-- ============ SCRIPTS ============ -->
 
   <!-- Firebase v8 CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -308,25 +269,67 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- VUL HIER JOUW ECHTE FIREBASE CONFIG IN -->
+  <!-- JOUW FIREBASE CONFIG (VOLLEDIG INGEVULD) -->
   <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-  authDomain: "compolink-112.firebaseapp.com",
-  projectId: "compolink-112",
-  storageBucket: "compolink-112.firebasestorage.app",
-  messagingSenderId: "1045338539276",
-  appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-  measurementId: "G-VF4TTS8CJD"
-};
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
+      authDomain: "compolink-112.firebaseapp.com",
+      projectId: "compolink-112",
+      storageBucket: "compolink-112.firebasestorage.app",
+      messagingSenderId: "1045338539276",
+      appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
+      measurementId: "G-VF4TTS8CJD"
+    };
     firebase.initializeApp(firebaseConfig);
   </script>
 
-  <!-- Chart.js voor analytics -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- JOUW APP LOGICA -->
-  <script src="app.js"></script>
+  <!-- JOUW SCRIPT: gebruik hier de code die jij stuurde als script.js -->
+  <script src="script.js"></script>
+
+  <!-- Live koers-widget voor de linker kolom -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const list = document.getElementById("market-prices");
+      if (!list) return;
+
+      async function loadPrices() {
+        list.innerHTML = "<li>Koersen laden...</li>";
+        try {
+          const res = await fetch("https://api.metals.live/v1/spot");
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+
+          const symbols = ["gold", "silver", "platinum", "palladium"];
+          list.innerHTML = "";
+
+          data.forEach((row) => {
+            const [symbol, price] = row;
+            if (!symbols.includes(String(symbol).toLowerCase())) return;
+
+            const li = document.createElement("li");
+            li.className = "market-price-item";
+            li.innerHTML = `
+              <span class="material-symbol">${String(symbol).toUpperCase()}</span>
+              <span class="material-price">${Number(price).toFixed(2)} USD</span>
+            `;
+            list.appendChild(li);
+          });
+
+          if (!list.children.length) {
+            list.innerHTML = "<li>Geen koersen beschikbaar.</li>";
+          }
+        } catch (err) {
+          console.error("Fout bij laden koersen:", err);
+          list.innerHTML = "<li>Fout bij laden koersen.</li>";
+        }
+      }
+
+      loadPrices();
+      setInterval(loadPrices, 60000); // elke minuut verversen
+    });
+  </script>
 </body>
 </html>
