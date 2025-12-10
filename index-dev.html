@@ -1,345 +1,134 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <title>CompoLink – Development</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Zelfde font / styles als je main site -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Extra styling voor de dev-layout + market sidebar -->
-  <style>
-    body {
-      margin: 0;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #020617 0, #020617 45%, #020617 100%);
-      color: #e5e7eb;
-    }
-
-    .dev-app {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .dev-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 24px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-      backdrop-filter: blur(18px);
-      background: linear-gradient(90deg, rgba(15,23,42,0.96), rgba(15,23,42,0.85));
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .dev-logo {
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      font-size: 1.1rem;
-    }
-    .dev-logo span {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-left: 6px;
-      text-transform: uppercase;
-    }
-
-    .dev-layout {
-      display: flex;
-      gap: 20px;
-      max-width: 1200px;
-      margin: 24px auto 32px;
-      padding: 0 16px;
-    }
-
-    /* Sidebar links met live prijzen */
-    .live-sidebar {
-      width: 280px;
-      border-radius: 18px;
-      border: 1px solid rgba(30, 64, 175, 0.75);
-      background: radial-gradient(circle at top left, rgba(37,99,235,0.28), rgba(15,23,42,0.98));
-      padding: 14px 16px 16px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .live-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #bfdbfe;
-    }
-    .live-sub {
-      font-size: 0.78rem;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-
-    .live-error {
-      font-size: 0.78rem;
-      color: #fecaca;
-    }
-
-    .live-list {
-      list-style: none;
-      padding: 0;
-      margin: 4px 0 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .live-item {
-      border-radius: 12px;
-      padding: 8px 10px;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(30, 64, 175, 0.65);
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .live-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-    }
-
-    .live-label {
-      font-size: 0.82rem;
-      font-weight: 500;
-    }
-
-    .live-tag {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: #9ca3af;
-    }
-
-    .live-value {
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .live-unit {
-      font-size: 0.75rem;
-      color: #9ca3af;
-    }
-
-    .live-updated {
-      font-size: 0.75rem;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
-    /* Rechterkant: playground / uitleg */
-    .dev-main {
-      flex: 1;
-      border-radius: 18px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      background: radial-gradient(circle at top right, rgba(56,189,248,0.16), rgba(15, 23, 42, 0.98));
-      padding: 18px 20px 20px;
-      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.95);
-    }
-
-    .dev-main h1 {
-      font-size: 1.25rem;
-      margin: 0 0 8px;
-    }
-    .dev-main p {
-      font-size: 0.9rem;
-      color: #d1d5db;
-      max-width: 640px;
-    }
-
-    .dev-hint {
-      margin-top: 18px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px dashed rgba(148, 163, 184, 0.6);
-      font-size: 0.8rem;
-      color: #9ca3af;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.8rem;
-      background: rgba(15, 23, 42, 0.9);
-      padding: 2px 5px;
-      border-radius: 4px;
-    }
-
-    @media (max-width: 900px) {
-      .dev-layout {
-        flex-direction: column;
-      }
-      .live-sidebar {
-        width: 100%;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>CompoLink – Development Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="dev-app">
-    <header class="dev-header">
-      <div class="dev-logo">
-        CompoLink <span>development</span>
-      </div>
-      <div style="font-size:0.8rem; color:#9ca3af;">
-        Sandbox – breekt je echte demo niet
-      </div>
-    </header>
+<body class="dev-body">
+  <header class="dev-header">
+    <div class="dev-header-left">
+      <span class="logo-dot"></span>
+      <span class="logo-text">CompoLink – Development dashboard</span>
+    </div>
+    <div class="dev-header-right">
+      <span class="badge">Demo mode</span>
+    </div>
+  </header>
 
-    <main class="dev-layout">
-      <!-- LINKERKANT: live materiaalprijzen -->
-      <aside class="live-sidebar">
-        <div class="live-title">Live materiaalprijzen</div>
-        <p class="live-sub">
-          Data via MetalpriceAPI (demo). Wordt elke paar minuten vernieuwd.
+  <main class="dev-layout">
+    <!-- LINKERKANT: LIVE MATERIALEN / GOUD KOERS -->
+    <aside class="dev-sidebar">
+      <section class="sidebar-section">
+        <h2>Live material prices</h2>
+        <p class="muted">
+          Voorbeeld: spotprijzen van metalen (goud, zilver, enz.).
         </p>
-        <div id="market-error" class="live-error"></div>
-
-        <ul class="live-list">
-          <li class="live-item">
-            <div class="live-row">
-              <div class="live-label">Goud</div>
-              <div class="live-tag">XAU</div>
-            </div>
-            <div class="live-row">
-              <div class="live-value" id="gold-price">—</div>
-              <div class="live-unit">USD per troy ounce (ongeveer)</div>
-            </div>
-          </li>
-
-          <li class="live-item">
-            <div class="live-row">
-              <div class="live-label">Zilver</div>
-              <div class="live-tag">XAG</div>
-            </div>
-            <div class="live-row">
-              <div class="live-value" id="silver-price">—</div>
-              <div class="live-unit">USD per troy ounce (ongeveer)</div>
-            </div>
-          </li>
-
-          <li class="live-item">
-            <div class="live-row">
-              <div class="live-label">Koper</div>
-              <div class="live-tag">XCU</div>
-            </div>
-            <div class="live-row">
-              <div class="live-value" id="copper-price">—</div>
-              <div class="live-unit">USD per eenheid (API-definitie)</div>
-            </div>
-          </li>
-        </ul>
-
-        <div class="live-updated">
-          Laatst bijgewerkt: <span id="last-updated">nog niet geladen</span>
-        </div>
-      </aside>
-
-      <!-- RECHTS: playground / uitleg -->
-      <section class="dev-main">
-        <h1>Development playground</h1>
-        <p>
-          Dit scherm kun je gebruiken om nieuwe features voor CompoLink te testen
-          (bijvoorbeeld deze live materiaalprijzen) zonder dat je de “echte” demo
-          <code>index.html</code> stuk maakt.
+        <ul id="dev-market-prices" class="market-prices-list"></ul>
+        <p class="market-note">
+          Gegevens worden automatisch opgehaald en regelmatig geüpdatet.
         </p>
-
-        <div class="dev-hint">
-          <strong>Tip:</strong> Als je deze sidebar later in je echte app wilt hebben,
-          kun je de HTML van <code>.live-sidebar</code> en het script onderaan
-          gewoon kopiëren naar je bestaande <code>index.html</code> /
-          <code>script.js</code>.
-        </div>
       </section>
-    </main>
-  </div>
+    </aside>
 
-  <!-- ===== JS: Live prijzen ophalen ===== -->
+    <!-- RECHTS: WEBSITE SCREEN / UITLEG -->
+    <section class="dev-main">
+      <h1>CompoLink platform overview</h1>
+      <p class="page-intro">
+        Dit scherm toont hoe inkopers en leveranciers real-time inzicht krijgen
+        in materiaalprijzen, beschikbaarheid én community-updates.
+      </p>
+
+      <div class="dev-grid">
+        <article class="dev-card">
+          <h3>1. Market overview</h3>
+          <p>
+            In de productieversie zie je hier direct je eigen composiet-
+            materialen, beschikbare volumes per leverancier en geprojecteerde
+            lead-times op basis van eerdere orders.
+          </p>
+        </article>
+
+        <article class="dev-card">
+          <h3>2. Supply chain analytics</h3>
+          <p>
+            De analytics-module combineert voorraadgegevens met volatiliteit in
+            grondstofprijzen (zoals de goudkoers) om risico's in je supply
+            chain zichtbaar te maken.
+          </p>
+        </article>
+
+        <article class="dev-card">
+          <h3>3. Community feed</h3>
+          <p>
+            Gebruikers kunnen updates delen over vertragingen, nieuwe batches,
+            certificaten (bijv. EN9100) en RFQ's. Dit verlaagt de
+            informatie-asymmetrie in de keten.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    © <span id="dev-year"></span> CompoLink – Development demo
+  </footer>
+
+  <!-- Simpele JS alleen voor deze demo-pagina -->
   <script>
-    // 1. VUL JE EIGEN API KEY IN (na gratis account op metalpriceapi.com)
-    const METAL_API_KEY = 	901bd242644d73e5ee914c48862f173b;
+    // jaar in footer
+    document.getElementById("dev-year").textContent =
+      new Date().getFullYear();
 
-    // Basis URL – we vragen goud (XAU), zilver (XAG) en koper (XCU) op in USD
-    const API_URL =
-      "https://api.metalpriceapi.com/v1/latest" +
-      "?api_key=" + METAL_API_KEY +
-      "&base=USD&currencies=XAU,XAG,XCU";
+    const devMarketList = document.getElementById("dev-market-prices");
 
-    async function fetchMarketPrices() {
-      const errorEl = document.getElementById("market-error");
-      const updatedEl = document.getElementById("last-updated");
-      errorEl.textContent = "";
+    async function loadDevMarketPrices() {
+      if (!devMarketList) return;
+      devMarketList.innerHTML = "<li>Laden van marktdata…</li>";
 
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
-        }
-
+        // Voorbeeld van een publieke metals-API (kan je later vervangen door eigen endpoint)
+        const res = await fetch("https://api.metals.live/v1/spot");
+        if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
-        console.log("MetalpriceAPI data:", data);
 
-        const rates = data.rates || {};
+        // data is bv: [ ["gold", 2345.6], ["silver", 29.1], ... ]
+        const symbolsToShow = ["gold", "silver", "platinum", "palladium"];
 
-        // MetalpriceAPI werkt (net als veel FX-API's) meestal als:
-        // 1 USD = rate * XAU  -> dus USD/oz ≈ 1 / rate
-        function setPrice(symbol, elementId) {
-          const el = document.getElementById(elementId);
-          const r = rates[symbol];
+        devMarketList.innerHTML = "";
 
-          if (!r || typeof r !== "number") {
-            el.textContent = "n.v.t.";
-            return;
-          }
+        data.forEach((row) => {
+          const [symbol, price] = row;
+          if (!symbolsToShow.includes(String(symbol).toLowerCase())) return;
 
-          let usdPerUnit;
-          if (r > 1) {
-            // Dan is het waarschijnlijk al USD per unit
-            usdPerUnit = r;
-          } else {
-            // Waarschijnlijk FX-stijl: 1 USD = r XAU, dus we draaien het om
-            usdPerUnit = 1 / r;
-          }
-
-          el.textContent = usdPerUnit.toFixed(2);
-        }
-
-        setPrice("XAU", "gold-price");
-        setPrice("XAG", "silver-price");
-        setPrice("XCU", "copper-price");
-
-        const now = new Date();
-        updatedEl.textContent = now.toLocaleTimeString("nl-NL", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
+          const li = document.createElement("li");
+          li.className = "market-price-item";
+          li.innerHTML = `
+            <span class="material-symbol">${symbol.toUpperCase()}</span>
+            <span class="material-price">~ ${Number(price).toFixed(2)} USD</span>
+          `;
+          devMarketList.appendChild(li);
         });
 
+        if (!devMarketList.children.length) {
+          devMarketList.innerHTML =
+            "<li>Kon geen geldige prijsdata tonen.</li>";
+        }
       } catch (err) {
-        console.error(err);
-        errorEl.textContent =
-          "Kon live prijzen niet laden. Check je internet en API key.";
+        console.error("Fout bij ophalen marktdata:", err);
+        devMarketList.innerHTML =
+          "<li>Fout bij laden van marktdata. Probeer later opnieuw.</li>";
       }
     }
 
-    // Eerste keer direct laden
-    fetchMarketPrices();
-    // Daarna elke 5 minuten verversen
-    setInterval(fetchMarketPrices, 5 * 60 * 1000);
+    // direct laden + elke minuut verversen
+    loadDevMarketPrices();
+    setInterval(loadDevMarketPrices, 60000);
   </script>
 </body>
 </html>
