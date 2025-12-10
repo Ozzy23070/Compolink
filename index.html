@@ -1,544 +1,517 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-  <meta charset="UTF-8">
-  <title>CompoLink Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- JOUW EIGEN STYLES: achtergrond / blur / layout / logo -->
-  <link rel="stylesheet" href="style.css">
+document.addEventListener("DOMContentLoaded", () => {
+  // ==== Firebase verwijzingen ====
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-  <!-- Extra styling alleen voor de community layout -->
-  <style>
-    .community-layout {
-      display: flex;
-      gap: 16px;
-      margin-top: 12px;
+  // ==== Globale state ====
+  let currentUser = null;
+  let currentUserRole = null;
+  let messagesUnsub = null;
+  let currentGroupId = "market";
+
+  const GROUPS = [
+    { id: "market",       label: "Market updates" },
+    { id: "supplier-news", label: "Supplier news" },
+    { id: "jobs-rfqs",    label: "Jobs & RFQs" }
+  ];
+
+  // ==== DOM referenties ====
+  const authWrapper = document.getElementById("auth-wrapper");
+  const app = document.getElementById("app");
+  const loginTab = document.getElementById("login-tab");
+  const signupTab = document.getElementById("signup-tab");
+  const loginForm = document.getElementById("login-form");
+  const signupForm = document.getElementById("signup-form");
+  const loginError = document.getElementById("login-error");
+  const signupError = document.getElementById("signup-error");
+  const logoutBtn = document.getElementById("logout-btn");
+  const userTag = document.getElementById("user-tag");
+  const yearSpan = document.getElementById("year");
+
+  const postForm = document.getElementById("post-form");
+  const postText = document.getElementById("post-text");
+  const postFile = document.getElementById("post-file");
+  const postFeed = document.getElementById("post-feed");
+  const groupList = document.getElementById("group-list");
+  const currentGroupNameSpan = document.getElementById("current-group-name");
+
+  const cartItemsEl = document.getElementById("cart-items");
+  const cartEmptyMsgEl = document.getElementById("cart-empty-msg");
+  const cartWeightEl = document.getElementById("cart-weight");
+  const cartTotalEl = document.getElementById("cart-total");
+
+  const shipForm = document.getElementById("shipping-form");
+  const shipWeightInput = document.getElementById("ship-weight");
+  const shipRegionInput = document.getElementById("ship-region");
+  const summaryMaterialEl = document.getElementById("summary-material");
+  const summaryShippingEl = document.getElementById("summary-shipping");
+  const summaryTotalEl = document.getElementById("summary-total");
+
+  yearSpan.textContent = new Date().getFullYear();
+
+  // =========================
+  // AUTH TABS
+  // =========================
+  loginTab.addEventListener("click", () => {
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
+    loginError.textContent = "";
+    signupError.textContent = "";
+  });
+
+  signupTab.addEventListener("click", () => {
+    signupTab.classList.add("active");
+    loginTab.classList.remove("active");
+    signupForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+    loginError.textContent = "";
+    signupError.textContent = "";
+  });
+
+  // =========================
+  // SIGNUP – rol opslaan (buyer/supplier)
+  // =========================
+  signupForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    signupError.textContent = "";
+
+    const name = document.getElementById("signup-name").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const roleInput = document.querySelector('input[name="signup-role"]:checked');
+    const role = roleInput ? roleInput.value : "buyer";
+
+    if (!name || !email || !password) {
+      signupError.textContent = "Vul alle velden in.";
+      return;
     }
-    .community-sidebar {
-      width: 220px;
-      font-size: 0.85rem;
-      border-right: 1px solid rgba(148, 163, 184, 0.25);
-      padding-right: 12px;
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((cred) => {
+        // displayName instellen
+        if (name) {
+          cred.user.updateProfile({ displayName: name }).catch(() => {});
+        }
+        // user-document in Firestore
+        return db.collection("users").doc(cred.user.uid).set({
+          name: name,
+          email: email,
+          role: role,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => {
+        signupForm.reset();
+        loginTab.click(); // terug naar login-tab
+      })
+      .catch((err) => {
+        console.error(err);
+        signupError.textContent = err.message || "Account aanmaken mislukt.";
+      });
+  });
+
+  // =========================
+  // LOGIN
+  // =========================
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    loginError.textContent = "";
+
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        loginForm.reset();
+      })
+      .catch((err) => {
+        console.error(err);
+        loginError.textContent = err.message || "Inloggen mislukt.";
+      });
+  });
+
+  // =========================
+  // LOGOUT
+  // =========================
+  logoutBtn.addEventListener("click", () => {
+    auth.signOut().catch((err) => console.error(err));
+  });
+
+  // =========================
+  // AUTH STATE LISTENER
+  // =========================
+  auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    if (messagesUnsub) {
+      messagesUnsub();
+      messagesUnsub = null;
     }
-    .community-sidebar h3 {
-      margin-bottom: 6px;
-      font-size: 0.9rem;
+
+    if (user) {
+      authWrapper.classList.add("hidden");
+      app.classList.remove("hidden");
+      userTag.textContent = user.displayName || user.email || "Ingelogde gebruiker";
+
+      // rol ophalen
+      db.collection("users").doc(user.uid).get()
+        .then((doc) => {
+          const data = doc.data() || {};
+          currentUserRole = data.role || "buyer";
+        })
+        .catch(() => {
+          currentUserRole = "buyer";
+        });
+
+      initNavigation();
+      initCart();
+      initAnalyticsChart();
+      initCommunityGroups();
+      subscribeToMessages();
+    } else {
+      app.classList.add("hidden");
+      authWrapper.classList.remove("hidden");
+      userTag.textContent = "Demo user";
+      currentUserRole = null;
     }
-    .group-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+  });
+
+  // =========================
+  // NAVIGATIE (pages wisselen)
+  // =========================
+  function goToPage(pageId) {
+    document.querySelectorAll(".page").forEach((section) => {
+      section.classList.toggle("active-page", section.id === pageId);
+    });
+
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.page === pageId);
+    });
+  }
+
+  function initNavigation() {
+    document.querySelectorAll("[data-page]").forEach((el) => {
+      el.onclick = () => {
+        const pageId = el.getAttribute("data-page");
+        if (pageId) goToPage(pageId);
+      };
+    });
+
+    goToPage("overview");
+  }
+
+  // =========================
+  // WINKELMAND / STOCK
+  // =========================
+  const cart = [];
+
+  function initCart() {
+    const buttons = document.querySelectorAll(".add-to-cart");
+    buttons.forEach((btn) => {
+      btn.onclick = () => {
+        const tr = btn.closest("tr");
+        if (!tr) return;
+        const dataStr = tr.getAttribute("data-item");
+        if (!dataStr) return;
+
+        try {
+          const item = JSON.parse(dataStr);
+          cart.push(item);
+          renderCart();
+        } catch (err) {
+          console.error("Kan data-item niet parsen", err);
+        }
+      };
+    });
+    renderCart();
+  }
+
+  function renderCart() {
+    if (!cartItemsEl) return;
+    cartItemsEl.innerHTML = "";
+
+    if (cart.length === 0) {
+      if (cartEmptyMsgEl) cartEmptyMsgEl.style.display = "block";
+    } else {
+      if (cartEmptyMsgEl) cartEmptyMsgEl.style.display = "none";
     }
-    .group-btn {
-      width: 100%;
-      text-align: left;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      padding: 6px 10px;
-      background: rgba(15, 23, 42, 0.96);
-      color: #e5e7eb;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
+
+    let totalWeight = 0;
+    let totalPrice = 0;
+
+    cart.forEach((item) => {
+      const li = document.createElement("li");
+      const linePrice = (item.price || 0) * (item.weight || 0);
+      li.textContent = `${item.name} – ${item.weight} kg × €${item.price.toFixed(2)}/kg = €${linePrice.toFixed(2)}`;
+      cartItemsEl.appendChild(li);
+
+      totalWeight += item.weight || 0;
+      totalPrice += linePrice;
+    });
+
+    if (cartWeightEl) cartWeightEl.textContent = totalWeight.toFixed(1);
+    if (cartTotalEl) cartTotalEl.textContent = totalPrice.toFixed(2);
+    if (summaryMaterialEl) summaryMaterialEl.textContent = totalPrice.toFixed(2);
+
+    if (shipWeightInput) {
+      shipWeightInput.value = totalWeight.toFixed(1);
     }
-    .group-btn:hover {
-      border-color: #60a5fa;
+
+    updateTotals();
+  }
+
+  // =========================
+  // ANALYTICS (Chart.js)
+  // =========================
+  let stockChartInstance = null;
+
+  function initAnalyticsChart() {
+    const ctx = document.getElementById("stockChart");
+    if (!ctx || typeof Chart === "undefined") return;
+
+    if (stockChartInstance) {
+      stockChartInstance.destroy();
     }
-    .group-btn.active {
-      border-color: #3b82f6;
-      background: rgba(37, 99, 235, 0.25);
-    }
-    .community-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .post-form textarea {
-      width: 100%;
-      min-height: 70px;
-      resize: vertical;
-      border-radius: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.98);
-      color: #e5e7eb;
-      padding: 8px 10px;
-      font-size: 0.88rem;
-      outline: none;
-    }
-    .post-form textarea:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 1px #3b82f6;
-    }
-    .post-form-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .post-form input[type="file"] {
-      font-size: 0.78rem;
-      color: #9ca3af;
-      max-width: 60%;
-    }
-    .post-feed {
-      max-height: 320px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .post-card {
-      border-radius: 12px;
-      border: 1px solid rgba(31, 41, 55, 0.9);
-      background: rgba(15, 23, 42, 0.98);
-      padding: 8px 10px;
-      font-size: 0.86rem;
-    }
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-    .post-text {
-      margin-top: 2px;
-      margin-bottom: 4px;
-    }
-    .post-image {
-      margin-top: 4px;
-      border-radius: 10px;
-      max-width: 100%;
-      display: block;
-    }
-    .post-file {
-      margin-top: 4px;
-      display: inline-block;
-      font-size: 0.8rem;
-      color: #93c5fd;
-      text-decoration: underline;
-    }
-    @media (max-width: 900px) {
-      .community-layout {
-        flex-direction: column;
+
+    stockChartInstance = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Carbon prepreg T700", "Epoxy hars 2K", "Glass fabric 450 g/m²"],
+        datasets: [{
+          label: "Stock (kg)",
+          data: [1500, 3200, 7800]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
       }
-      .community-sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-        padding-bottom: 8px;
-        margin-bottom: 6px;
-      }
-      .post-form input[type="file"] {
-        max-width: 100%;
-      }
+    });
+  }
+
+  // =========================
+  // COMMUNITY – groepen
+  // =========================
+  function initCommunityGroups() {
+    if (!groupList || !currentGroupNameSpan) return;
+    groupList.innerHTML = "";
+
+    GROUPS.forEach((group, index) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "group-btn" + (index === 0 ? " active" : "");
+      btn.textContent = group.label;
+      btn.dataset.groupId = group.id;
+      btn.onclick = () => {
+        currentGroupId = group.id;
+        currentGroupNameSpan.textContent = group.label;
+        document.querySelectorAll(".group-btn").forEach((b) => {
+          b.classList.toggle("active", b === btn);
+        });
+        subscribeToMessages();
+      };
+      li.appendChild(btn);
+      groupList.appendChild(li);
+    });
+
+    const firstGroup = GROUPS[0];
+    currentGroupId = firstGroup.id;
+    currentGroupNameSpan.textContent = firstGroup.label;
+  }
+
+  // =========================
+  // COMMUNITY – berichten ophalen
+  // =========================
+  function subscribeToMessages() {
+    if (!db || !postFeed) return;
+    if (messagesUnsub) {
+      messagesUnsub();
+      messagesUnsub = null;
     }
-  </style>
-</head>
-<body>
 
-  <!-- AUTH WRAPPER (LOGIN + SIGNUP) -->
-  <div id="auth-wrapper" class="auth-wrapper">
-    <div class="auth-bg"></div>
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-logo">CompoLink</div>
-        <p class="auth-subtitle">Your digital marketplace for composite materials</p>
-      </div>
+    messagesUnsub = db.collection("messages")
+      .where("groupId", "==", currentGroupId)
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .onSnapshot((snapshot) => {
+        postFeed.innerHTML = "";
+        if (snapshot.empty) {
+          const empty = document.createElement("div");
+          empty.textContent = "Nog geen posts in deze groep.";
+          empty.style.fontSize = "0.8rem";
+          empty.style.color = "#9ca3af";
+          postFeed.appendChild(empty);
+          return;
+        }
 
-      <div class="auth-tabs">
-        <button id="login-tab" class="auth-tab active">Inloggen</button>
-        <button id="signup-tab" class="auth-tab">Account aanmaken</button>
-      </div>
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const card = document.createElement("div");
+          card.className = "post-card";
 
-      <!-- LOGIN FORM -->
-      <form id="login-form" class="auth-form">
-        <label>
-          E-mail
-          <input type="email" id="login-email" required />
-        </label>
-        <label>
-          Wachtwoord
-          <input type="password" id="login-password" required />
-        </label>
-        <p id="login-error" class="error-msg"></p>
-        <button type="submit" class="btn-primary auth-btn">Inloggen</button>
-      </form>
+          const header = document.createElement("div");
+          header.className = "post-header";
 
-      <!-- SIGNUP FORM -->
-      <form id="signup-form" class="auth-form hidden">
-        <p class="auth-note">
-          Maak een demo-account. Je gegevens worden opgeslagen in Firebase (CompoLink-112 project).
-        </p>
-        <label>
-          Naam
-          <input type="text" id="signup-name" name="name" placeholder="Jouw naam" required>
-        </label>
-        <label>
-          E-mail
-          <input type="email" id="signup-email" name="email" placeholder="jij@bedrijf.com" required>
-        </label>
-        <label>
-          Wachtwoord
-          <input type="password" id="signup-password" name="password" placeholder="Kies een wachtwoord" required>
-        </label>
+          const left = document.createElement("div");
+          left.textContent = data.userName || "Onbekende gebruiker";
 
-        <label>Accounttype</label>
-        <div class="auth-role">
-          <label>
-            <input type="radio" name="signup-role" value="buyer" checked>
-            Koper (buyer)
-          </label>
-          <label>
-            <input type="radio" name="signup-role" value="supplier">
-            Verkoper (supplier)
-          </label>
-        </div>
+          const right = document.createElement("div");
+          const parts = [];
 
-        <p id="signup-error" class="error-msg"></p>
-        <button type="submit" class="btn-primary auth-btn">Account aanmaken</button>
-      </form>
-    </div>
-  </div>
+          if (data.role === "buyer") {
+            parts.push("Buyer");
+          } else if (data.role === "supplier") {
+            parts.push("Supplier");
+          }
 
-  <!-- HOOFD APP – ZICHTBAAR NA LOGIN -->
-  <div id="app" class="app hidden">
-    <header class="app-header">
-      <div class="logo">CompoLink</div>
-      <nav class="top-nav">
-        <button class="nav-btn active" data-page="overview">Overview</button>
-        <button class="nav-btn" data-page="stock">Stock</button>
-        <button class="nav-btn" data-page="buyers">Buyers & Suppliers</button>
-        <button class="nav-btn" data-page="analytics">Analytics</button>
-        <button class="nav-btn" data-page="tracking">Tracking</button>
-        <button class="nav-btn" data-page="community">Community feed</button>
-        <button class="nav-btn" data-page="checkout">Checkout</button>
-      </nav>
-      <div class="header-right">
-        <span class="user-tag" id="user-tag">Demo user</span>
-        <button id="logout-btn" class="btn-ghost">Log uit</button>
-      </div>
-    </header>
+          if (data.createdAt && data.createdAt.toDate) {
+            parts.push(data.createdAt.toDate().toLocaleString());
+          }
 
-    <main class="pages">
-      <!-- OVERVIEW -->
-      <section id="overview" class="page page-1 active-page">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card hero-card">
-            <p class="eyebrow">YOUR DIGITAL MARKETPLACE FOR COMPOSITE MATERIALS</p>
-            <h1>Verbind kopers en suppliers van composietmaterialen.</h1>
-            <p>
-              CompoLink bundelt Europese composiet-suppliers op één platform.
-              Buyers zien direct welke materialen op voorraad zijn, met prijs, kwaliteit, lead time
-              en certificeringen – volledig transparant.
-            </p>
-            <div class="btn-row">
-              <button class="btn-primary" data-page="stock">Bekijk stock</button>
-              <button class="btn-secondary" data-page="community">Community feed</button>
-            </div>
-            <ul class="badges">
-              <li>RFID track &amp; trace</li>
-              <li>Min / max orders</li>
-              <li>Realtime stock inzicht</li>
-              <li>5% platform fee</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+          right.textContent = parts.join(" • ");
 
-      <!-- STOCK -->
-      <section id="stock" class="page page-2">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card wide">
-            <h2>Actuele stock (demo)</h2>
-            <p>
-              Voorbeeld van een stock-pagina met composietmaterialen. Buyers kunnen materialen vergelijken
-              en direct toevoegen aan hun order.
-            </p>
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>RFID</th>
-                    <th>Materiaal</th>
-                    <th>Supplier</th>
-                    <th>Prijs/kg</th>
-                    <th>Stock (kg)</th>
-                    <th>Min (kg)</th>
-                    <th>Max (kg)</th>
-                    <th>In winkelmand</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr data-item='{"id":"RFID-00123","name":"Carbon prepreg T700","price":24.9,"weight":50}'>
-                    <td>RFID-00123</td>
-                    <td>Carbon prepreg T700</td>
-                    <td>EuroCarbon BV</td>
-                    <td>€24,90</td>
-                    <td>1.500</td>
-                    <td>50</td>
-                    <td>500</td>
-                    <td><button class="btn-small add-to-cart">+ 50 kg</button></td>
-                  </tr>
-                  <tr data-item='{"id":"RFID-00456","name":"Epoxy hars 2K","price":6.2,"weight":25}'>
-                    <td>RFID-00456</td>
-                    <td>Epoxy hars 2K</td>
-                    <td>ResinTech</td>
-                    <td>€6,20</td>
-                    <td>3.200</td>
-                    <td>25</td>
-                    <td>400</td>
-                    <td><button class="btn-small add-to-cart">+ 25 kg</button></td>
-                  </tr>
-                  <tr data-item='{"id":"RFID-00991","name":"Glass fabric 450 g/m²","price":4.1,"weight":40}'>
-                    <td>RFID-00991</td>
-                    <td>Glass fabric 450 g/m²</td>
-                    <td>GlassWeave</td>
-                    <td>€4,10</td>
-                    <td>7.800</td>
-                    <td>40</td>
-                    <td>600</td>
-                    <td><button class="btn-small add-to-cart">+ 40 kg</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          header.appendChild(left);
+          header.appendChild(right);
 
-            <div class="cart-summary">
-              <h3>Winkelmand (demo)</h3>
-              <p id="cart-empty-msg">Nog geen items toegevoegd.</p>
-              <ul id="cart-items"></ul>
-              <p><strong>Totaal gewicht:</strong> <span id="cart-weight">0</span> kg</p>
-              <p><strong>Totaal materiaalprijs:</strong> € <span id="cart-total">0.00</span></p>
-              <button class="btn-secondary" data-page="checkout">Ga naar checkout</button>
-            </div>
-          </div>
-        </div>
-      </section>
+          const text = document.createElement("div");
+          text.className = "post-text";
+          text.textContent = data.text || "";
 
-      <!-- BUYERS & SUPPLIERS -->
-      <section id="buyers" class="page page-3">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card two-cols">
-            <div>
-              <h2>Buyers</h2>
-              <ul class="checklist">
-                <li>Vergelijk prijs, kwaliteit en lead time per materiaal.</li>
-                <li>Filter op certificeringen en materiaal-properties.</li>
-                <li>Volume-kortingen voor grote OEM’s en Tier-1 suppliers.</li>
-                <li>Volledige transparantie in min/max order per leverancier.</li>
-              </ul>
-            </div>
-            <div>
-              <h2>Suppliers</h2>
-              <ul class="checklist">
-                <li>Publiceer stock met realtime updates en duidelijke prijzen.</li>
-                <li>Dynamic pricing op basis van volume en contractduur.</li>
-                <li>RFID-ID per batch voor traceerbaarheid door de hele keten.</li>
-                <li>CompoLink rekent een vaste platform fee (bijv. 5%).</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+          card.appendChild(header);
+          card.appendChild(text);
 
-      <!-- ANALYTICS -->
-      <section id="analytics" class="page page-4">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card wide">
-            <h2>Analytics – stock per materiaal</h2>
-            <p>
-              Buyers en suppliers kunnen trends in voorraad en verbruik zien. Deze demo laat een
-              eenvoudige verdeling van stock per materiaaltype zien.
-            </p>
-            <div class="chart-wrapper">
-              <canvas id="stockChart"></canvas>
-            </div>
-            <p class="small-note">
-              In een echte implementatie wordt deze grafiek gevoed met live data uit het CompoLink-platform.
-            </p>
-          </div>
-        </div>
-      </section>
+          if (data.fileUrl && data.fileName) {
+            if (data.fileType === "image") {
+              const img = document.createElement("img");
+              img.src = data.fileUrl;
+              img.alt = data.fileName;
+              img.className = "post-image";
+              card.appendChild(img);
+            } else {
+              const link = document.createElement("a");
+              link.href = data.fileUrl;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              link.className = "post-file";
+              link.textContent = data.fileName;
+              card.appendChild(link);
+            }
+          }
 
-      <!-- TRACKING -->
-      <section id="tracking" class="page page-5">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card">
-            <h2>Tracking & logistiek</h2>
-            <p>
-              Elke zending krijgt een uniek RFID-ID. CompoLink koppelt deze aan logistieke partners zodat
-              buyers realtime de status kunnen volgen: van supplier hub naar productieplant.
-            </p>
-            <div class="mock-map">
-              <div class="route"></div>
-              <div class="dot dot-start">Supplier hub</div>
-              <div class="dot dot-end">Buyer plant</div>
-              <div class="truck">🚚</div>
-            </div>
-            <p class="small-note">
-              Deze map is een visuele mock-up. Voor echte integratie wordt gekoppeld met tracking-API’s
-              van carriers (bijv. PostNL, DHL, enz.).
-            </p>
-          </div>
-        </div>
-      </section>
+          postFeed.appendChild(card);
+        });
+      }, (err) => {
+        console.error("Fout bij ophalen messages:", err);
+      });
+  }
 
-      <!-- COMMUNITY FEED -->
-      <section id="community" class="page page-6">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card wide">
-            <h2>Community feed</h2>
-            <p>
-              Deel updates over prijs, stock, certificaten en RFQ’s. Nieuwe gebruikers kunnen ook oudere posts zien.
-            </p>
+  // =========================
+  // COMMUNITY – bericht plaatsen
+  // =========================
+  if (postForm) {
+    postForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) {
+        alert("Log in om een update te plaatsen.");
+        return;
+      }
 
-            <div class="community-layout">
-              <aside class="community-sidebar">
-                <h3>Groepen</h3>
-                <ul id="group-list" class="group-list">
-                  <!-- knoppen worden via script.js gevuld -->
-                </ul>
-              </aside>
+      const text = postText.value.trim();
+      const file = postFile.files[0];
 
-              <div class="community-main">
-                <form id="post-form" class="post-form">
-                  <label for="post-text" style="font-size:0.8rem; color:#9ca3af;">
-                    Plaats een update in <span id="current-group-name">groep</span>
-                  </label>
-                  <textarea id="post-text" placeholder="Bijv. 'Nieuwe batch T700 prepreg beschikbaar, prijsupdate €23,90/kg...'"></textarea>
-                  <div class="post-form-footer">
-                    <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.xlsx,.xls,.csv" />
-                    <button type="submit" class="btn-primary" style="width:auto;padding:6px 16px;">Plaatsen</button>
-                  </div>
-                </form>
+      if (!text && !file) {
+        alert("Typ een bericht of kies een bestand.");
+        return;
+      }
 
-                <div id="post-feed" class="post-feed">
-                  <!-- posts uit Firestore -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      try {
+        let fileUrl = null;
+        let fileName = null;
+        let fileType = null;
 
-      <!-- CHECKOUT -->
-      <section id="checkout" class="page page-7">
-        <div class="page-overlay"></div>
-        <div class="page-content">
-          <div class="card wide">
-            <h2>Checkout & verzendkosten (demo)</h2>
-            <p>
-              Deze demo toont hoe verzendkosten automatisch kunnen worden berekend op basis van
-              bestemming en totaalgewicht. Tarieven zijn benaderingen geïnspireerd op PostNL,
-              maar <strong>geen live of officiële prijzen</strong>.
-            </p>
+        if (file) {
+          fileName = file.name;
+          const path = `community/${currentGroupId}/${Date.now()}_${file.name}`;
+          const storageRef = storage.ref().child(path);
+          const snapshot = await storageRef.put(file);
+          fileUrl = await snapshot.ref.getDownloadURL();
+          fileType = file.type && file.type.startsWith("image/") ? "image" : "file";
+        }
 
-            <div class="checkout-grid">
-              <div class="checkout-left">
-                <h3>Verzendgegevens</h3>
-                <form id="shipping-form">
-                  <label>
-                    Naam
-                    <input type="text" id="ship-name" placeholder="Naam ontvanger" required>
-                  </label>
-                  <label>
-                    E-mail
-                    <input type="email" id="ship-email" placeholder="ontvanger@bedrijf.com" required>
-                  </label>
-                  <label>
-                    Adres
-                    <input type="text" id="ship-address" placeholder="Straat + huisnummer" required>
-                  </label>
-                  <label>
-                    Postcode
-                    <input type="text" id="ship-zip" placeholder="Bijv. 2525 CP" required>
-                  </label>
-                  <label>
-                    Stad
-                    <input type="text" id="ship-city" placeholder="Den Haag" required>
-                  </label>
-                  <label>
-                    Land / regio
-                    <select id="ship-region" required>
-                      <option value="NL">Nederland</option>
-                      <option value="EU">Europa (EU)</option>
-                      <option value="WORLD">Wereld</option>
-                    </select>
-                  </label>
-                  <label>
-                    Totaal gewicht (kg)
-                    <input type="number" id="ship-weight" min="0" step="0.1" placeholder="Wordt automatisch ingevuld" required>
-                  </label>
+        const groupDef = GROUPS.find((g) => g.id === currentGroupId) || GROUPS[0];
 
-                  <button type="submit" class="btn-primary">Bereken verzendkosten</button>
-                </form>
-              </div>
+        await db.collection("messages").add({
+          text: text,
+          groupId: currentGroupId,
+          groupName: groupDef.label,
+          userId: currentUser.uid,
+          userName: currentUser.displayName || currentUser.email,
+          role: currentUserRole || "buyer",
+          fileUrl: fileUrl,
+          fileName: fileName,
+          fileType: fileType,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-              <div class="checkout-right">
-                <h3>Samenvatting order</h3>
-                <div class="summary-line">
-                  <span>Materiaalprijs</span>
-                  <span>€ <span id="summary-material">0.00</span></span>
-                </div>
-                <div class="summary-line">
-                  <span>Verzendkosten (demo)</span>
-                  <span>€ <span id="summary-shipping">0.00</span></span>
-                </div>
-                <div class="summary-line total">
-                  <span>Totaal</span>
-                  <span>€ <span id="summary-total">0.00</span></span>
-                </div>
-                <p class="small-note">
-                  Verzendtarieven in deze demo:
-                  <br>NL: tot 10 kg ≈ €7, daarna stapjes per 10 kg.
-                  <br>EU: hogere basisprijs, Wereld: nog hoger.
-                  <br>Voor echte koppeling is een officiële PostNL-/carrier-API nodig.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+        postText.value = "";
+        postFile.value = "";
+      } catch (err) {
+        console.error("Plaatsen mislukt:", err);
+        alert("Plaatsen mislukt: " + (err.message || "onbekende fout"));
+      }
+    });
+  }
 
-    <footer class="app-footer">
-      <span>© <span id="year"></span> CompoLink – Demo voor project 4.1</span>
-    </footer>
-  </div>
+  // =========================
+  // CHECKOUT / VERZENDKOSTEN
+  // =========================
+  function calculateShipping(region, weight) {
+    if (!weight || weight <= 0) return 0;
+    let base = 0;
+    let per10 = 0;
 
-  <!-- Firebase SDK's -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+    if (region === "NL") {
+      base = 7;
+      per10 = 4;
+    } else if (region === "EU") {
+      base = 15;
+      per10 = 8;
+    } else {
+      base = 25;
+      per10 = 12;
+    }
+    const extraSteps = Math.max(0, Math.ceil(weight / 10) - 1);
+    return base + extraSteps * per10;
+  }
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-      authDomain: "compolink-112.firebaseapp.com",
-      projectId: "compolink-112",
-      storageBucket: "compolink-112.firebasestorage.app",
-      messagingSenderId: "1045338539276",
-      appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-      measurementId: "G-VF4TTS8CJD"
-    };
-    firebase.initializeApp(firebaseConfig);
-  </script>
+  function updateTotals() {
+    const material = parseFloat(summaryMaterialEl ? summaryMaterialEl.textContent : "0") || 0;
+    const region = shipRegionInput ? shipRegionInput.value : "NL";
+    const weight = parseFloat(shipWeightInput ? shipWeightInput.value : "0") || 0;
+    const shipping = calculateShipping(region, weight);
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+    if (summaryShippingEl) summaryShippingEl.textContent = shipping.toFixed(2);
+    if (summaryTotalEl) summaryTotalEl.textContent = (material + shipping).toFixed(2);
+  }
+
+  if (shipForm) {
+    shipForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      updateTotals();
+    });
+  }
+  if (shipRegionInput) {
+    shipRegionInput.addEventListener("change", updateTotals);
+  }
+  if (shipWeightInput) {
+    shipWeightInput.addEventListener("input", updateTotals);
+  }
+});
