@@ -1,22 +1,24 @@
+// ======================================
 // Firebase services
+// ======================================
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
 document.addEventListener("DOMContentLoaded", () => {
-  let currentUser = null;
-  let chartCreated = false;
-  let postsUnsubscribe = null;
-
-  // ==== DOM REFERENTIES ====
+  // ====================================
+  // DOM REFERENTIES
+  // ====================================
   const authWrapper = document.getElementById("auth-wrapper");
   const app = document.getElementById("app");
+
   const loginTab = document.getElementById("login-tab");
   const signupTab = document.getElementById("signup-tab");
   const loginForm = document.getElementById("login-form");
   const signupForm = document.getElementById("signup-form");
   const loginError = document.getElementById("login-error");
   const signupError = document.getElementById("signup-error");
+
   const userTag = document.getElementById("user-tag");
   const logoutBtn = document.getElementById("logout-btn");
   const yearSpan = document.getElementById("year");
@@ -25,84 +27,57 @@ document.addEventListener("DOMContentLoaded", () => {
   const pages = document.querySelectorAll(".page");
   const internalPageButtons = document.querySelectorAll("[data-page]");
 
-  // Cart
-  const cartItemsList = document.getElementById("cart-items");
-  const cartEmptyMsg = document.getElementById("cart-empty-msg");
-  const cartWeightSpan = document.getElementById("cart-weight");
-  const cartTotalSpan = document.getElementById("cart-total");
+  // Stock / cart
+  const cartItemsEl = document.getElementById("cart-items");
+  const cartEmptyMsgEl = document.getElementById("cart-empty-msg");
+  const cartWeightEl = document.getElementById("cart-weight");
+  const cartTotalEl = document.getElementById("cart-total");
   const addToCartButtons = document.querySelectorAll(".add-to-cart");
-  let cart = [];
 
   // Checkout
-  const materialSummarySpan = document.getElementById("summary-material");
-  const shippingSummarySpan = document.getElementById("summary-shipping");
-  const totalSummarySpan = document.getElementById("summary-total");
   const shippingForm = document.getElementById("shipping-form");
+  const shipRegionInput = document.getElementById("ship-region");
   const shipWeightInput = document.getElementById("ship-weight");
+  const summaryMaterialEl = document.getElementById("summary-material");
+  const summaryShippingEl = document.getElementById("summary-shipping");
+  const summaryTotalEl = document.getElementById("summary-total");
 
-  // Community feed
+  // Community
   const groupListEl = document.getElementById("group-list");
   const currentGroupNameEl = document.getElementById("current-group-name");
+  const postFeed = document.getElementById("post-feed");
   const postForm = document.getElementById("post-form");
   const postText = document.getElementById("post-text");
   const postFile = document.getElementById("post-file");
-  const postFeed = document.getElementById("post-feed");
+
+  // Analytics
+  const stockChartCanvas = document.getElementById("stockChart");
 
   if (yearSpan) {
     yearSpan.textContent = new Date().getFullYear();
   }
 
-  // ==== COMMUNITY GROEPEN ====
+  // ====================================
+  // GLOBALE STATE
+  // ====================================
+  let currentUser = null;
+  let currentUserRole = "buyer";
+
+  const cart = [];
+  let stockChartInstance = null;
+
+  // Community / Firestore subscriptions
+  let postsUnsubscribe = null;
+
   const GROUPS = [
-    {
-      id: "market-updates",
-      name: "Market updates",
-      description: "Prijswijzigingen, stock updates, lead times."
-    },
-    {
-      id: "certificates-rfq",
-      name: "Certificates & RFQ’s",
-      description: "Nieuwe certificaten, RFQ’s en technische documentatie."
-    }
+    { id: "market-updates", label: "Market updates" },
+    { id: "certificates-rfq", label: "Certificates & RFQ's" }
   ];
   let activeGroupId = GROUPS[0].id;
 
-  function seedGroupsInFirestore() {
-    if (!db) return;
-    GROUPS.forEach((g) => {
-      db.collection("groups").doc(g.id).set(
-        {
-          id: g.id,
-          name: g.name,
-          description: g.description,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        },
-        { merge: true }
-      );
-    });
-  }
-
-  function renderGroupList() {
-    if (!groupListEl) return;
-    groupListEl.innerHTML = "";
-    GROUPS.forEach((g) => {
-      const li = document.createElement("li");
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "group-btn" + (g.id === activeGroupId ? " active" : "");
-      btn.textContent = g.name;
-      btn.addEventListener("click", () => {
-        activeGroupId = g.id;
-        if (currentGroupNameEl) currentGroupNameEl.textContent = g.name;
-        renderGroupList();
-        subscribeToGroupFeed();
-      });
-      li.appendChild(btn);
-      groupListEl.appendChild(li);
-    });
-  }
-
-  // ==== HELPER FUNCTIES ====
+  // ====================================
+  // HELPER FUNCTIES
+  // ====================================
 
   function showAuth() {
     if (!authWrapper || !app) return;
@@ -110,22 +85,34 @@ document.addEventListener("DOMContentLoaded", () => {
     app.classList.add("hidden");
   }
 
-  function showApp(name) {
+  function showApp() {
     if (!authWrapper || !app) return;
     authWrapper.classList.add("hidden");
     app.classList.remove("hidden");
-    if (name && userTag) userTag.textContent = name;
-    showPage("overview");
-    initChart();
-    syncCartToUI();
-    seedGroupsInFirestore();
-    renderGroupList();
-    if (currentGroupNameEl) currentGroupNameEl.textContent = GROUPS[0].name;
-    subscribeToGroupFeed();
+  }
+
+  function updateUserTag() {
+    if (!userTag) return;
+
+    if (!currentUser) {
+      userTag.textContent = "";
+      return;
+    }
+
+    const baseName = currentUser.displayName || currentUser.email || "User";
+    const roleLabel = currentUserRole
+      ? currentUserRole.toUpperCase()
+      : "USER";
+
+    // Voorbeeld: "SELLER Oguzhan Ates"
+    userTag.textContent = `${roleLabel} ${baseName}`;
   }
 
   function parseFirebaseError(err) {
-    if (!err || !err.code) return "Er ging iets mis. Probeer het opnieuw.";
+    if (!err || !err.code) {
+      return "Er ging iets mis. Probeer het opnieuw.";
+    }
+
     switch (err.code) {
       case "auth/email-already-in-use":
         return "Er bestaat al een account met dit e-mailadres.";
@@ -141,25 +128,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ==== FIREBASE AUTH STATE ====
+  // ====================================
+  // NAVIGATIE
+  // ====================================
 
-  auth.onAuthStateChanged((user) => {
-    currentUser = user || null;
+  function showPage(pageId) {
+    pages.forEach((page) => {
+      page.classList.toggle("active-page", page.id === pageId);
+    });
 
-    if (user) {
-      const name = user.displayName || user.email || "User";
-      showApp(name);
-    } else {
-      if (postsUnsubscribe) {
-        postsUnsubscribe();
-        postsUnsubscribe = null;
-      }
-      showAuth();
+    navButtons.forEach((btn) => {
+      const target = btn.dataset.page;
+      btn.classList.toggle("active", target === pageId);
+    });
+
+    if (pageId === "analytics") {
+      initAnalyticsChart();
+    }
+  }
+
+  navButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.page;
+      if (!target) return;
+      showPage(target);
+    });
+  });
+
+  // Knoppen met data-page (bijv. op hero card)
+  internalPageButtons.forEach((btn) => {
+    if (!btn.classList.contains("nav-btn")) {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.page;
+        if (!target) return;
+        showPage(target);
+      });
     }
   });
 
-  // ==== TAB WISSELEN LOGIN / SIGNUP ====
+  // ====================================
+  // AUTH: LOGIN / SIGNUP / LOGOUT
+  // ====================================
 
+  // Tabs wisselen
   if (loginTab && signupTab && loginForm && signupForm) {
     loginTab.addEventListener("click", () => {
       loginTab.classList.add("active");
@@ -180,35 +191,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==== SIGNUP ====
-
+  // Sign up
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (signupError) signupError.textContent = "";
 
       const name = document.getElementById("signup-name")?.value.trim();
-      const email = document.getElementById("signup-email")?.value.trim().toLowerCase();
-      const password = document.getElementById("signup-password")?.value.trim();
-      const roleInput = document.querySelector("input[name='signup-role']:checked");
+      const email = document
+        .getElementById("signup-email")
+        ?.value.trim()
+        .toLowerCase();
+      const password = document
+        .getElementById("signup-password")
+        ?.value.trim();
+      const roleInput = document.querySelector(
+        "input[name='signup-role']:checked"
+      );
       const role = roleInput ? roleInput.value : null;
 
       if (!name || !email || !password || !role) {
-        if (signupError) signupError.textContent = "Vul alle velden in en kies een accounttype.";
+        if (signupError) {
+          signupError.textContent =
+            "Vul alle velden in en kies een accounttype.";
+        }
         return;
       }
 
       try {
-        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        const cred = await auth.createUserWithEmailAndPassword(
+          email,
+          password
+        );
+
         if (cred.user && name) {
           await cred.user.updateProfile({ displayName: name });
         }
+
         await db.collection("users").doc(cred.user.uid).set({
           name,
           email,
           role,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
         if (signupError) signupError.textContent = "";
         signupForm.reset();
         alert("Account aangemaakt! Je kunt nu inloggen.");
@@ -220,18 +246,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==== LOGIN ====
-
+  // Login
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (loginError) loginError.textContent = "";
 
-      const email = document.getElementById("login-email")?.value.trim().toLowerCase();
+      const email = document
+        .getElementById("login-email")
+        ?.value.trim()
+        .toLowerCase();
       const password = document.getElementById("login-password")?.value;
 
       if (!email || !password) {
-        if (loginError) loginError.textContent = "Vul e-mail en wachtwoord in.";
+        if (loginError) loginError.textContent =
+          "Vul e-mail en wachtwoord in.";
         return;
       }
 
@@ -244,55 +273,62 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ==== LOGOUT ====
-
+  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       auth.signOut().catch((err) => console.error(err));
     });
   }
 
-  // ==== PAGINA NAVIGATIE ====
+  // Auth state listener
+  auth.onAuthStateChanged(async (user) => {
+    currentUser = user || null;
 
-  function showPage(id) {
-    pages.forEach((page) => {
-      page.classList.toggle("active-page", page.id === id);
-    });
-
-    navButtons.forEach((btn) => {
-      const target = btn.dataset.page;
-      btn.classList.toggle("active", target === id);
-    });
-
-    if (id === "analytics") {
-      initChart();
+    if (postsUnsubscribe) {
+      postsUnsubscribe();
+      postsUnsubscribe = null;
     }
-  }
 
-  navButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.page;
-      if (!target) return;
-      showPage(target);
-    });
+    if (!currentUser) {
+      currentUserRole = "buyer";
+      updateUserTag();
+      showAuth();
+      return;
+    }
+
+    // Rol ophalen uit Firestore
+    currentUserRole = "buyer";
+    try {
+      const doc = await db.collection("users").doc(currentUser.uid).get();
+      if (doc.exists && doc.data().role) {
+        currentUserRole = doc.data().role;
+      }
+    } catch (err) {
+      console.warn("Kon gebruikersrol niet ophalen:", err);
+    }
+
+    updateUserTag();
+    showApp();
+    showPage("overview"); // start op overview
+
+    // Community initialiseren
+    renderGroupList();
+    subscribeToGroupFeed();
+
+    // Cart / analytics
+    syncCartToUI();
+    initAnalyticsChart();
   });
 
-  internalPageButtons.forEach((btn) => {
-    if (!btn.classList.contains("nav-btn")) {
-      btn.addEventListener("click", () => {
-        const target = btn.dataset.page;
-        if (!target) return;
-        showPage(target);
-      });
-    }
-  });
-
-  // ==== CART LOGICA ====
+  // ====================================
+  // CART LOGICA
+  // ====================================
 
   function syncCartToUI() {
-    if (!cartItemsList || !cartWeightSpan || !cartTotalSpan) return;
+    if (!cartItemsEl || !cartWeightEl || !cartTotalEl) return;
 
-    cartItemsList.innerHTML = "";
+    cartItemsEl.innerHTML = "";
+
     let totalWeight = 0;
     let totalPrice = 0;
 
@@ -301,24 +337,25 @@ document.addEventListener("DOMContentLoaded", () => {
       totalPrice += item.totalPrice;
 
       const li = document.createElement("li");
-      li.textContent = `${item.name} – ${item.totalWeight} kg (€${item.totalPrice.toFixed(
-        2
-      )})`;
-      cartItemsList.appendChild(li);
+      li.textContent = `${item.name} – ${item.totalWeight.toFixed(
+        1
+      )} kg (€${item.totalPrice.toFixed(2)})`;
+      cartItemsEl.appendChild(li);
     });
 
-    cartWeightSpan.textContent = totalWeight.toFixed(1);
-    cartTotalSpan.textContent = totalPrice.toFixed(2);
+    cartWeightEl.textContent = totalWeight.toFixed(1);
+    cartTotalEl.textContent = totalPrice.toFixed(2);
 
-    if (materialSummarySpan) {
-      materialSummarySpan.textContent = totalPrice.toFixed(2);
-      if (shipWeightInput && totalWeight > 0) {
-        shipWeightInput.value = totalWeight.toFixed(1);
-      }
+    // Checkout samenvatting mee laten lopen
+    if (summaryMaterialEl) {
+      summaryMaterialEl.textContent = totalPrice.toFixed(2);
+    }
+    if (shipWeightInput && totalWeight > 0) {
+      shipWeightInput.value = totalWeight.toFixed(1);
     }
 
-    if (cartEmptyMsg) {
-      cartEmptyMsg.style.display = cart.length === 0 ? "block" : "none";
+    if (cartEmptyMsgEl) {
+      cartEmptyMsgEl.style.display = cart.length === 0 ? "block" : "none";
     }
   }
 
@@ -326,12 +363,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const row = btn.closest("tr");
       if (!row) return;
+
       const itemData = row.getAttribute("data-item");
       if (!itemData) return;
 
       try {
         const item = JSON.parse(itemData);
         const existing = cart.find((c) => c.id === item.id);
+
         if (existing) {
           existing.totalWeight += item.weight;
           existing.totalPrice += item.price * item.weight;
@@ -343,6 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
             totalPrice: item.price * item.weight
           });
         }
+
         syncCartToUI();
       } catch (err) {
         console.error("Fout bij parsen cart-item:", err);
@@ -350,13 +390,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ==== CHECKOUT / VERZENDKOSTEN ====
+  // ====================================
+  // CHECKOUT / VERZENDKOSTEN
+  // ====================================
 
   function calculateShipping(region, weightKg) {
-    if (weightKg <= 0) return 0;
+    if (!weightKg || weightKg <= 0) return 0;
 
     let base = 0;
     let step = 0;
+
     switch (region) {
       case "NL":
         base = 7;
@@ -364,20 +407,19 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "EU":
         base = 15;
-        step = 7;
+        step = 8;
         break;
       case "WORLD":
         base = 25;
-        step = 10;
+        step = 12;
         break;
       default:
         base = 7;
         step = 4;
     }
 
-    if (weightKg <= 10) {
-      return base;
-    }
+    // tot 10 kg alleen basis; daarboven blokken van 10 kg
+    if (weightKg <= 10) return base;
     const extraBlocks = Math.ceil((weightKg - 10) / 10);
     return base + extraBlocks * step;
   }
@@ -385,178 +427,39 @@ document.addEventListener("DOMContentLoaded", () => {
   if (shippingForm) {
     shippingForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const region = document.getElementById("ship-region").value;
-      const weight = parseFloat(
-        document.getElementById("ship-weight").value || "0"
-      );
+
+      const region = shipRegionInput ? shipRegionInput.value : "NL";
+      const weight = parseFloat(shipWeightInput?.value || "0");
       const materialTotal = parseFloat(
-        materialSummarySpan?.textContent || "0"
+        summaryMaterialEl?.textContent || "0"
       );
 
       const shippingCost = calculateShipping(region, weight);
-      const total = materialTotal + shippingCost;
+      const grandTotal = materialTotal + shippingCost;
 
-      if (shippingSummarySpan)
-        shippingSummarySpan.textContent = shippingCost.toFixed(2);
-      if (totalSummarySpan)
-        totalSummarySpan.textContent = total.toFixed(2);
+      if (summaryShippingEl) {
+        summaryShippingEl.textContent = shippingCost.toFixed(2);
+      }
+      if (summaryTotalEl) {
+        summaryTotalEl.textContent = grandTotal.toFixed(2);
+      }
     });
   }
 
-  // ==== COMMUNITY FEED (LINKEDIN-STIJL) ====
+  // ====================================
+  // ANALYTICS (Chart.js)
+  // ====================================
 
-  function renderPostsSnapshot(snapshot) {
-    if (!postFeed) return;
-    postFeed.innerHTML = "";
+  function initAnalyticsChart() {
+    if (!stockChartCanvas || typeof Chart === "undefined") return;
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.groupId !== activeGroupId) return;
-
-      const card = document.createElement("article");
-      card.className = "post-card";
-
-      const header = document.createElement("div");
-      header.className = "post-header";
-
-      const userEl = document.createElement("div");
-      userEl.className = "post-user";
-      userEl.textContent = data.userName || "Onbekende user";
-
-      const timeEl = document.createElement("div");
-      timeEl.className = "post-time";
-      let timeText = "";
-      if (data.createdAt && data.createdAt.toDate) {
-        const d = data.createdAt.toDate();
-        timeText =
-          d.toLocaleDateString("nl-NL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit"
-          }) +
-          " " +
-          d.toLocaleTimeString("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-      }
-      timeEl.textContent = timeText;
-
-      header.appendChild(userEl);
-      header.appendChild(timeEl);
-      card.appendChild(header);
-
-      if (data.text) {
-        const p = document.createElement("p");
-        p.className = "post-text";
-        p.textContent = data.text;
-        card.appendChild(p);
-      }
-
-      if (data.fileUrl) {
-        if (data.fileType && data.fileType.startsWith("image/")) {
-          const img = document.createElement("img");
-          img.src = data.fileUrl;
-          img.alt = data.fileName || "upload";
-          img.className = "post-image";
-          card.appendChild(img);
-        } else {
-          const link = document.createElement("a");
-          link.href = data.fileUrl;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.className = "post-file";
-          link.textContent = data.fileName || "Bekijk document";
-          card.appendChild(link);
-        }
-      }
-
-      postFeed.appendChild(card);
-    });
-  }
-
-  function subscribeToGroupFeed() {
-    if (!db || !postFeed) return;
-
-    if (postsUnsubscribe) {
-      postsUnsubscribe();
-      postsUnsubscribe = null;
+    if (stockChartInstance) {
+      return; // al aangemaakt
     }
 
-    postsUnsubscribe = db
-      .collection("posts")
-      .orderBy("createdAt", "desc")
-      .limit(100)
-      .onSnapshot(
-        (snapshot) => {
-          renderPostsSnapshot(snapshot);
-        },
-        (err) => {
-          console.error("Post feed error", err);
-        }
-      );
-  }
+    const ctx = stockChartCanvas.getContext("2d");
 
-  if (postForm && postText && postFile) {
-    postForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentUser) {
-        alert("Log eerst in om een update te plaatsen.");
-        return;
-      }
-
-      const text = postText.value.trim();
-      const file = postFile.files[0];
-
-      if (!text && !file) {
-        alert("Schrijf een update of voeg een bestand toe.");
-        return;
-      }
-
-      let fileUrl = null;
-      let fileName = null;
-      let fileType = null;
-
-      try {
-        if (file) {
-          const path = `posts/${currentUser.uid}/${Date.now()}_${file.name}`;
-          const ref = storage.ref().child(path);
-          await ref.put(file);
-          fileUrl = await ref.getDownloadURL();
-          fileName = file.name;
-          fileType = file.type;
-        }
-
-        await db.collection("posts").add({
-          text,
-          fileUrl,
-          fileName,
-          fileType,
-          groupId: activeGroupId,
-          userId: currentUser.uid,
-          userName: currentUser.displayName || currentUser.email || "User",
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        postText.value = "";
-        postFile.value = "";
-      } catch (err) {
-        console.error("Fout bij plaatsen post:", err);
-        alert("Plaatsen mislukt: " + err.message);
-      }
-    });
-  }
-
-  // ==== ANALYTICS CHART ====
-
-  function initChart() {
-    if (chartCreated) return;
-    const ctx = document.getElementById("stockChart");
-    if (!ctx || typeof Chart === "undefined") return;
-
-    chartCreated = true;
-
-    new Chart(ctx, {
+    stockChartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels: [
@@ -595,11 +498,201 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // eerste keer cart ui
+  // ====================================
+  // COMMUNITY FEED
+  // ====================================
+
+  function renderGroupList() {
+    if (!groupListEl) return;
+
+    groupListEl.innerHTML = "";
+
+    GROUPS.forEach((group) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className =
+        "group-btn" + (group.id === activeGroupId ? " active" : "");
+      btn.textContent = group.label;
+
+      btn.addEventListener("click", () => {
+        activeGroupId = group.id;
+        renderGroupList();
+        if (currentGroupNameEl) currentGroupNameEl.textContent = group.label;
+        if (currentUser) subscribeToGroupFeed();
+      });
+
+      li.appendChild(btn);
+      groupListEl.appendChild(li);
+    });
+
+    const active = GROUPS.find((g) => g.id === activeGroupId) || GROUPS[0];
+    if (currentGroupNameEl && active) {
+      currentGroupNameEl.textContent = active.label;
+    }
+  }
+
+  function renderPostsSnapshot(snapshot) {
+    if (!postFeed) return;
+
+    postFeed.innerHTML = "";
+
+    if (snapshot.empty) {
+      const empty = document.createElement("div");
+      empty.className = "post-empty";
+      empty.textContent = "Nog geen posts in deze groep.";
+      postFeed.appendChild(empty);
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+
+      const card = document.createElement("article");
+      card.className = "post-card";
+
+      const header = document.createElement("div");
+      header.className = "post-header";
+
+      const userEl = document.createElement("div");
+      userEl.textContent = data.userName || "Onbekende user";
+
+      const timeEl = document.createElement("div");
+      let timeText = "";
+      if (data.createdAt && data.createdAt.toDate) {
+        const d = data.createdAt.toDate();
+        timeText =
+          d.toLocaleDateString("nl-NL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit"
+          }) +
+          " " +
+          d.toLocaleTimeString("nl-NL", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+      }
+      timeEl.textContent = timeText;
+
+      header.appendChild(userEl);
+      header.appendChild(timeEl);
+      card.appendChild(header);
+
+      if (data.text) {
+        const p = document.createElement("p");
+        p.className = "post-text";
+        p.textContent = data.text;
+        card.appendChild(p);
+      }
+
+      if (data.fileUrl) {
+        if (data.fileType === "image") {
+          const img = document.createElement("img");
+          img.src = data.fileUrl;
+          img.alt = data.fileName || "upload";
+          img.className = "post-image";
+          card.appendChild(img);
+        } else {
+          const link = document.createElement("a");
+          link.href = data.fileUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.className = "post-file";
+          link.textContent = data.fileName || "Bekijk document";
+          card.appendChild(link);
+        }
+      }
+
+      postFeed.appendChild(card);
+    });
+  }
+
+  function subscribeToGroupFeed() {
+    if (!db || !postFeed) return;
+
+    if (postsUnsubscribe) {
+      postsUnsubscribe();
+      postsUnsubscribe = null;
+    }
+
+    postsUnsubscribe = db
+      .collection("posts")
+      .where("groupId", "==", activeGroupId)
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .onSnapshot(
+        (snapshot) => {
+          renderPostsSnapshot(snapshot);
+        },
+        (err) => {
+          console.error("Post feed error:", err);
+        }
+      );
+  }
+
+  if (postForm && postText && postFile) {
+    postForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) {
+        alert("Log eerst in om een update te plaatsen.");
+        return;
+      }
+
+      const text = postText.value.trim();
+      const file = postFile.files[0];
+
+      if (!text && !file) {
+        alert("Schrijf een update of voeg een bestand toe.");
+        return;
+      }
+
+      let fileUrl = null;
+      let fileName = null;
+      let fileType = null;
+
+      try {
+        if (file) {
+          const path = `posts/${currentUser.uid}/${Date.now()}_${file.name}`;
+          const ref = storage.ref().child(path);
+          const snapshot = await ref.put(file);
+          fileUrl = await snapshot.ref.getDownloadURL();
+          fileName = file.name;
+          fileType = file.type.startsWith("image/") ? "image" : "file";
+        }
+
+        await db.collection("posts").add({
+          text,
+          fileUrl,
+          fileName,
+          fileType,
+          groupId: activeGroupId,
+          userId: currentUser.uid,
+          userName:
+            currentUser.displayName || currentUser.email || "User",
+          role: currentUserRole || "buyer",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        postText.value = "";
+        postFile.value = "";
+      } catch (err) {
+        console.error("Fout bij plaatsen post:", err);
+        alert("Plaatsen mislukt: " + (err.message || "onbekende fout"));
+      }
+    });
+  }
+
+  // Eerste render van groups (ook als nog niet ingelogd)
+  renderGroupList();
+
+  // Cart UI initialiseren
   syncCartToUI();
 });
 
-// ================== SUPPLIERS & CERTIFICATES SEED ==================
+// ======================================
+// OPTIONAL: SEED COMPANIES & CERTIFICATES
+// ======================================
 
 const companiesSeed = {
   "toray-nijverdal": {
@@ -723,10 +816,13 @@ function setSeedStatus(text) {
   console.log(text);
 }
 
+// Aanroepbaar vanuit console: window.seedCompaniesAndCertificates()
 window.seedCompaniesAndCertificates = async function () {
   try {
     if (!db) {
-      console.error("Firestore 'db' is niet gedefinieerd. Check je firebase init.");
+      console.error(
+        "Firestore 'db' is niet gedefinieerd. Check je Firebase init."
+      );
       return;
     }
 
@@ -742,7 +838,9 @@ window.seedCompaniesAndCertificates = async function () {
       ops.push(companyRef.set(company, { merge: true }));
 
       for (const [certId, certData] of Object.entries(certs)) {
-        const certRef = companyRef.collection("certificates").doc(certId);
+        const certRef = companyRef
+          .collection("certificates")
+          .doc(certId);
         ops.push(certRef.set(certData, { merge: true }));
       }
     }
