@@ -289,47 +289,67 @@
   <!-- JOUW SCRIPT: gebruik hier de code die jij stuurde als script.js -->
   <script src="script.js"></script>
 
-  <!-- Live koers-widget voor de linker kolom -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const list = document.getElementById("market-prices");
-      if (!list) return;
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const list = document.getElementById("market-prices");
+    if (!list) return;
 
-      async function loadPrices() {
-        list.innerHTML = "<li>Koersen laden...</li>";
-        try {
-          const res = await fetch("https://api.metals.live/v1/spot");
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const data = await res.json();
+    const fallback = [
+      { symbol: "GOLD", price: 2350 },
+      { symbol: "SILVER", price: 29.3 },
+      { symbol: "PLATINUM", price: 980 },
+      { symbol: "PALLADIUM", price: 1040 }
+    ];
 
-          const symbols = ["gold", "silver", "platinum", "palladium"];
-          list.innerHTML = "";
+    async function loadPrices() {
+      list.innerHTML = "<li>Koersen laden...</li>";
+      try {
+        const res = await fetch("https://api.metals.live/v1/spot");
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
 
-          data.forEach((row) => {
-            const [symbol, price] = row;
-            if (!symbols.includes(String(symbol).toLowerCase())) return;
+        const symbols = ["gold", "silver", "platinum", "palladium"];
+        const items = [];
 
-            const li = document.createElement("li");
-            li.className = "market-price-item";
-            li.innerHTML = `
-              <span class="material-symbol">${String(symbol).toUpperCase()}</span>
-              <span class="material-price">${Number(price).toFixed(2)} USD</span>
-            `;
-            list.appendChild(li);
-          });
-
-          if (!list.children.length) {
-            list.innerHTML = "<li>Geen koersen beschikbaar.</li>";
+        data.forEach(([symbol, price]) => {
+          if (symbols.includes(String(symbol).toLowerCase())) {
+            items.push({
+              symbol: String(symbol).toUpperCase(),
+              price: Number(price)
+            });
           }
-        } catch (err) {
-          console.error("Fout bij laden koersen:", err);
-          list.innerHTML = "<li>Fout bij laden koersen.</li>";
-        }
-      }
+        });
 
-      loadPrices();
-      setInterval(loadPrices, 60000); // elke minuut verversen
-    });
-  </script>
+        if (!items.length) throw new Error("Geen geldige data");
+
+        list.innerHTML = "";
+        items.forEach(({ symbol, price }) => {
+          const li = document.createElement("li");
+          li.className = "market-price-item";
+          li.innerHTML = `
+            <span class="material-symbol">${symbol}</span>
+            <span class="material-price">${price.toFixed(2)} USD</span>
+          `;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Fout bij laden koersen, gebruik fallback:", err);
+        list.innerHTML = "";
+        fallback.forEach(({ symbol, price }) => {
+          const li = document.createElement("li");
+          li.className = "market-price-item";
+          li.innerHTML = `
+            <span class="material-symbol">${symbol}</span>
+            <span class="material-price">~ ${price.toFixed(2)} USD</span>
+          `;
+          list.appendChild(li);
+        });
+      }
+    }
+
+    loadPrices();
+    setInterval(loadPrices, 600000); // elke 10 min
+  });
+</script>
 </body>
 </html>
