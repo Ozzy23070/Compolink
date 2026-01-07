@@ -848,3 +848,10 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("hamburgerBtn").addEventListener("click", () => {
   document.querySelector(".nav-center").classList.toggle("active");
 });
+const burger = document.getElementById("hamburgerBtn");
+const nav = document.getElementById("primaryNav");
+
+burger.addEventListener("click", () => {
+  const isOpen = nav.classList.toggle("active");
+  burger.setAttribute("aria-expanded", String(isOpen));
+});
