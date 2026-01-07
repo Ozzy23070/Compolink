@@ -94,41 +94,60 @@
     </div>
   </div>
 
-  <!-- ============ APP (NA INLOGGEN) ============ -->
-<header class="top-nav">
-  <div class="nav-left">
-    <button
-      id="hamburgerBtn"
-      class="hamburger"
-      type="button"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="primaryNav"
-    >
-      ☰
-    </button>
+<!-- ============ APP (NA INLOGGEN) ============ -->
+<div id="app" class="app hidden">
 
-    <span class="nav-logo">CompoLink</span>
+  <header class="top-nav">
+    <div class="nav-left">
+      <button
+        id="hamburgerBtn"
+        class="hamburger"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="primaryNav"
+      >
+        ☰
+      </button>
+
+      <span class="nav-logo">CompoLink</span>
+    </div>
+
+    <nav id="primaryNav" class="nav-center" aria-label="Primary navigation">
+      <button class="nav-btn active" type="button" data-page="overview">Overview</button>
+      <button class="nav-btn" type="button" data-page="stock">Stock</button>
+      <button class="nav-btn" type="button" data-page="buyers">Buyers & Suppliers</button>
+      <button class="nav-btn" type="button" data-page="analytics">Analytics</button>
+      <button class="nav-btn" type="button" data-page="tracking">Tracking</button>
+      <button class="nav-btn" type="button" data-page="community">Community feed</button>
+      <button class="nav-btn" type="button" data-page="joint">Joint purchase</button>
+      <button class="nav-btn" type="button" data-page="checkout">Checkout</button>
+    </nav>
+
+    <div class="nav-right">
+      <span class="user-tag" id="user-tag">–</span>
+      <button id="logout-btn" class="logout-btn" type="button">Log out</button>
+    </div>
+  </header>
+
+  <!-- GLOBAL LIVE KOERSEN STRIP -->
+  <div id="market-strip" class="market-strip">
+    <span class="market-strip-label">Live material prices</span>
+    <ul id="market-prices-strip" class="market-prices-strip"></ul>
+    <span class="market-strip-note">
+      Indicatieve spotprijzen (goud, zilver, etc.) in USD.
+    </span>
   </div>
 
-  <nav id="primaryNav" class="nav-center" aria-label="Primary navigation">
-    <button class="nav-btn active" type="button" data-page="overview">Overview</button>
-    <button class="nav-btn" type="button" data-page="stock">Stock</button>
-    <button class="nav-btn" type="button" data-page="buyers">Buyers & Suppliers</button>
-    <button class="nav-btn" type="button" data-page="analytics">Analytics</button>
-    <button class="nav-btn" type="button" data-page="tracking">Tracking</button>
-    <button class="nav-btn" type="button" data-page="community">Community feed</button>
-    <button class="nav-btn" type="button" data-page="joint">Joint purchase</button>
-    <button class="nav-btn" type="button" data-page="checkout">Checkout</button>
-  </nav>
+  <main class="main-wrapper">
+    <!-- jouw sections zoals je ze al hebt (overview, stock, community, etc.) -->
+  </main>
 
-  <div class="nav-right">
-    <span class="user-tag" id="user-tag">–</span>
-    <button id="logout-btn" class="logout-btn" type="button">Log out</button>
-  </div>
-</header>
+  <footer class="app-footer">
+    © <span id="year"></span> CompoLink – Demo for project 4.1
+  </footer>
 
-
+</div>
 
     <!-- GLOBAL LIVE KOERSEN STRIP -->
     <div id="market-strip" class="market-strip">
