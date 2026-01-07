@@ -96,39 +96,40 @@
 
   <!-- ============ APP (NA INLOGGEN) ============ -->
   <div id="app" class="app hidden">
-    <!-- TOP NAV -->
+ <!-- TOP NAV -->
 <header class="top-nav">
   <div class="nav-left">
     <button
       class="hamburger"
       id="hamburgerBtn"
-      aria-label="Open menu"
       type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="primaryNav"
     >
       ☰
     </button>
+
     <span class="nav-logo">CompoLink</span>
   </div>
-  <nav class="nav-center" aria-label="Primary navigation">
-    <!-- jouw buttons -->
-  </nav>
-</header>
-      <nav class="nav-center" aria-label="Primary navigation">
-        <button class="nav-btn active" type="button" data-page="overview">Overview</button>
-        <button class="nav-btn" type="button" data-page="stock">Stock</button>
-        <button class="nav-btn" type="button" data-page="buyers">Buyers & Suppliers</button>
-        <button class="nav-btn" type="button" data-page="analytics">Analytics</button>
-        <button class="nav-btn" type="button" data-page="tracking">Tracking</button>
-        <button class="nav-btn" type="button" data-page="community">Community feed</button>
-        <button class="nav-btn" type="button" data-page="joint">Joint purchase</button>
-        <button class="nav-btn" type="button" data-page="checkout">Checkout</button>
-      </nav>
 
-      <div class="nav-right">
-        <span class="user-tag" id="user-tag">–</span>
-        <button id="logout-btn" class="logout-btn" type="button">Log out</button>
-      </div>
-    </header>
+  <nav id="primaryNav" class="nav-center" aria-label="Primary navigation">
+    <button class="nav-btn active" type="button" data-page="overview">Overview</button>
+    <button class="nav-btn" type="button" data-page="stock">Stock</button>
+    <button class="nav-btn" type="button" data-page="buyers">Buyers & Suppliers</button>
+    <button class="nav-btn" type="button" data-page="analytics">Analytics</button>
+    <button class="nav-btn" type="button" data-page="tracking">Tracking</button>
+    <button class="nav-btn" type="button" data-page="community">Community feed</button>
+    <button class="nav-btn" type="button" data-page="joint">Joint purchase</button>
+    <button class="nav-btn" type="button" data-page="checkout">Checkout</button>
+  </nav>
+
+  <div class="nav-right">
+    <span class="user-tag" id="user-tag">–</span>
+    <button id="logout-btn" class="logout-btn" type="button">Log out</button>
+  </div>
+</header>
+
 
     <!-- GLOBAL LIVE KOERSEN STRIP -->
     <div id="market-strip" class="market-strip">
