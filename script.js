@@ -2,12 +2,13 @@
 // 0) FIREBASE INIT (V8 CDN) - VUL JE EIGEN CONFIG IN
 // =====================================================
 const firebaseConfig = {
-  apiKey: "VUL_HIER_IN",
-  authDomain: "VUL_HIER_IN",
-  projectId: "VUL_HIER_IN",
-  storageBucket: "VUL_HIER_IN",
-  messagingSenderId: "VUL_HIER_IN",
-  appId: "VUL_HIER_IN"
+  apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
+  authDomain: "compolink-112.firebaseapp.com",
+  projectId: "compolink-112",
+  storageBucket: "compolink-112.firebasestorage.app",
+  messagingSenderId: "1045338539276",
+  appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
+  measurementId: "G-VF4TTS8CJD"
 };
 
 // Init only once
