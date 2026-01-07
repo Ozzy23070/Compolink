@@ -10,14 +10,6 @@ const firebaseConfig = {
   appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
   measurementId: "G-VF4TTS8CJD"
 };
-
-// Init only once
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-console.log("Firebase init OK:", firebase.app().options.projectId);
-
 // =====================================================
 // 1) Firebase services
 // =====================================================
