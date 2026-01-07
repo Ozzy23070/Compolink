@@ -1,33 +1,17 @@
-// =====================================================
-// 0) FIREBASE INIT (V8 CDN) - VUL JE EIGEN CONFIG IN
-// =====================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-  authDomain: "compolink-112.firebaseapp.com",
-  projectId: "compolink-112",
-  storageBucket: "compolink-112.firebasestorage.app",
-  messagingSenderId: "1045338539276",
-  appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-  measurementId: "G-VF4TTS8CJD"
-};
-// =====================================================
-// 1) Firebase services
-// =====================================================
+// ======================================
+// Firebase services (init gebeurt in index.html)
+// ======================================
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Extra: vang async errors duidelijker
 window.addEventListener("unhandledrejection", (e) => {
   console.error("Unhandled promise rejection:", e.reason);
 });
 
-// =====================================================
-// 2) APP
-// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
   // ====================================
-  // DOM REFERENTIES
+  // DOM
   // ====================================
   const authWrapper = document.getElementById("auth-wrapper");
   const app = document.getElementById("app");
@@ -47,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pages = document.querySelectorAll(".page");
   const internalPageButtons = document.querySelectorAll("[data-page]");
 
-  // Stock / cart
+  // Cart
   const cartItemsEl = document.getElementById("cart-items");
   const cartEmptyMsgEl = document.getElementById("cart-empty-msg");
   const cartWeightEl = document.getElementById("cart-weight");
@@ -73,12 +57,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // Analytics
   const stockChartCanvas = document.getElementById("stockChart");
 
-  if (yearSpan) {
-    yearSpan.textContent = new Date().getFullYear();
-  }
+  // Joint purchase
+  const jpListEl = document.getElementById("jp-list");
+  const jpCreateForm = document.getElementById("jp-create-form");
+  const jpJoinForm = document.getElementById("jp-join-form");
+  const jpSelectedEl = document.getElementById("jp-selected");
+  const jpCreateMsg = document.getElementById("jp-create-msg");
+  const jpJoinMsg = document.getElementById("jp-join-msg");
+
+  const jpTitleInput = document.getElementById("jp-title");
+  const jpMaterialInput = document.getElementById("jp-material");
+  const jpTargetKgInput = document.getElementById("jp-target-kg");
+  const jpBasePriceInput = document.getElementById("jp-base-price");
+  const jpAmountInput = document.getElementById("jp-amount");
+
+  if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
   // ====================================
-  // GLOBALE STATE
+  // STATE
   // ====================================
   let currentUser = null;
   let currentUserRole = "buyer";
@@ -86,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cart = [];
   let stockChartInstance = null;
 
-  // Community / Firestore subscriptions
   let postsUnsubscribe = null;
 
   const GROUPS = [
@@ -95,9 +90,15 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   let activeGroupId = GROUPS[0].id;
 
+  // Joint purchase state (demo persisted via localStorage)
+  const JP_STORAGE_KEY = "compolink_joint_purchases_v1";
+  let jpCampaigns = [];
+  let jpSelectedId = null;
+
   // ====================================
-  // HELPER FUNCTIES
+  // HELPERS
   // ====================================
+  const eur = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" });
 
   function showAuth() {
     if (!authWrapper || !app) return;
@@ -113,40 +114,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateUserTag() {
     if (!userTag) return;
-
     if (!currentUser) {
       userTag.textContent = "";
       return;
     }
-
     const baseName = currentUser.displayName || currentUser.email || "User";
     const roleLabel = currentUserRole ? currentUserRole.toUpperCase() : "USER";
     userTag.textContent = `${roleLabel} ${baseName}`;
   }
 
   function parseFirebaseError(err) {
-    if (!err) return "Er ging iets mis. Probeer het opnieuw.";
-    if (err.code) {
-      switch (err.code) {
-        case "auth/email-already-in-use":
-          return "Er bestaat al een account met dit e-mailadres.";
-        case "auth/invalid-email":
-          return "Dit is geen geldig e-mailadres.";
-        case "auth/weak-password":
-          return "Kies een sterker wachtwoord (minimaal 6 tekens).";
-        case "auth/user-not-found":
-        case "auth/wrong-password":
-          return "Onjuiste combinatie van e-mail en wachtwoord.";
-        default:
-          return `Er ging iets mis (${err.code}).`;
-      }
+    if (!err || !err.code) return "Er ging iets mis. Probeer het opnieuw.";
+    switch (err.code) {
+      case "auth/email-already-in-use": return "Er bestaat al een account met dit e-mailadres.";
+      case "auth/invalid-email": return "Dit is geen geldig e-mailadres.";
+      case "auth/weak-password": return "Kies een sterker wachtwoord (minimaal 6 tekens).";
+      case "auth/user-not-found":
+      case "auth/wrong-password": return "Onjuiste combinatie van e-mail en wachtwoord.";
+      default: return `Er ging iets mis (${err.code}).`;
     }
-    return err.message || "Er ging iets mis. Probeer het opnieuw.";
   }
-
-  // ====================================
-  // NAVIGATIE
-  // ====================================
 
   function showPage(pageId) {
     pages.forEach((page) => {
@@ -158,11 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.toggle("active", target === pageId);
     });
 
-    if (pageId === "analytics") {
-      initAnalyticsChart();
-    }
+    if (pageId === "analytics") initAnalyticsChart();
+    if (pageId === "joint") renderJointPurchases(); // ensure visible data
   }
 
+  // ====================================
+  // NAV
+  // ====================================
   navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.page;
@@ -182,9 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ====================================
-  // AUTH: LOGIN / SIGNUP / LOGOUT
+  // AUTH: tabs
   // ====================================
-
   if (loginTab && signupTab && loginForm && signupForm) {
     loginTab.addEventListener("click", () => {
       loginTab.classList.add("active");
@@ -205,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Sign up
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -223,10 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, password);
-
-        if (cred.user && name) {
-          await cred.user.updateProfile({ displayName: name });
-        }
+        if (cred.user && name) await cred.user.updateProfile({ displayName: name });
 
         await db.collection("users").doc(cred.user.uid).set({
           name,
@@ -245,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Login
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -267,13 +254,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       auth.signOut().catch((err) => console.error(err));
     });
   }
 
-  // Auth state listener
+  // Auth listener
   auth.onAuthStateChanged(async (user) => {
     currentUser = user || null;
 
@@ -289,13 +277,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Rol ophalen uit Firestore
+    // Role from Firestore
     currentUserRole = "buyer";
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
-      if (doc.exists && doc.data().role) {
-        currentUserRole = doc.data().role;
-      }
+      if (doc.exists && doc.data().role) currentUserRole = doc.data().role;
     } catch (err) {
       console.warn("Kon gebruikersrol niet ophalen:", err);
     }
@@ -304,22 +290,24 @@ document.addEventListener("DOMContentLoaded", () => {
     showApp();
     showPage("overview");
 
+    // Init pages
     renderGroupList();
     subscribeToGroupFeed();
-
     syncCartToUI();
     initAnalyticsChart();
+
+    // Joint purchase init/render
+    initJointPurchaseData();
+    renderJointPurchases();
   });
 
   // ====================================
-  // CART LOGICA
+  // CART
   // ====================================
-
   function syncCartToUI() {
     if (!cartItemsEl || !cartWeightEl || !cartTotalEl) return;
 
     cartItemsEl.innerHTML = "";
-
     let totalWeight = 0;
     let totalPrice = 0;
 
@@ -345,7 +333,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const row = btn.closest("tr");
       if (!row) return;
-
       const itemData = row.getAttribute("data-item");
       if (!itemData) return;
 
@@ -364,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
             totalPrice: item.price * item.weight
           });
         }
-
         syncCartToUI();
       } catch (err) {
         console.error("Fout bij parsen cart-item:", err);
@@ -373,15 +359,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ====================================
-  // CHECKOUT / VERZENDKOSTEN
+  // CHECKOUT
   // ====================================
-
   function calculateShipping(region, weightKg) {
     if (!weightKg || weightKg <= 0) return 0;
 
-    let base = 0;
-    let step = 0;
-
+    let base = 0, step = 0;
     switch (region) {
       case "NL": base = 7; step = 4; break;
       case "EU": base = 15; step = 8; break;
@@ -411,9 +394,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ====================================
-  // ANALYTICS (Chart.js)
+  // ANALYTICS
   // ====================================
-
   function initAnalyticsChart() {
     if (!stockChartCanvas || typeof Chart === "undefined") return;
     if (stockChartInstance) return;
@@ -438,9 +420,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ====================================
-  // COMMUNITY FEED
+  // COMMUNITY
   // ====================================
-
   function renderGroupList() {
     if (!groupListEl) return;
     groupListEl.innerHTML = "";
@@ -543,8 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
       postsUnsubscribe = null;
     }
 
-    console.log("Subscribing to posts:", activeGroupId);
-
     postsUnsubscribe = db
       .collection("posts")
       .where("groupId", "==", activeGroupId)
@@ -556,7 +535,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
   }
 
-  // POSTEN (met duidelijke status + disable)
   if (postForm && postText && postFile) {
     postForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -584,21 +562,16 @@ document.addEventListener("DOMContentLoaded", () => {
       let fileType = null;
 
       try {
-        // Upload (als er file is)
         if (file) {
-          // Gebruik community/<uid>/... (consistent met nette Storage rules)
           const safeName = file.name.replace(/[^\w.\-]+/g, "_");
           const path = `community/${currentUser.uid}/${Date.now()}_${safeName}`;
           const ref = storage.ref().child(path);
 
-          console.log("Uploading file to:", path);
           const snapshot = await ref.put(file);
           fileUrl = await snapshot.ref.getDownloadURL();
           fileName = file.name;
           fileType = file.type && file.type.startsWith("image/") ? "image" : "file";
         }
-
-        console.log("Writing Firestore post:", { groupId: activeGroupId });
 
         await db.collection("posts").add({
           text,
@@ -614,7 +587,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         postText.value = "";
         postFile.value = "";
-        console.log("Post placed OK");
       } catch (err) {
         console.error("Fout bij plaatsen post:", err);
         alert("Plaatsen mislukt: " + (err.message || "onbekende fout"));
@@ -624,77 +596,252 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Eerste render van groups (ook als nog niet ingelogd)
-  renderGroupList();
+  // ====================================
+  // JOINT PURCHASE (DEMO, persistent via localStorage)
+  // ====================================
+  function initJointPurchaseData() {
+    if (!jpListEl) return;
 
-  // Cart UI initialiseren
+    try {
+      const raw = localStorage.getItem(JP_STORAGE_KEY);
+      if (raw) {
+        jpCampaigns = JSON.parse(raw);
+        return;
+      }
+    } catch (_) {}
+
+    // Default campaigns (mooie bedragen/tiers)
+    jpCampaigns = [
+      {
+        id: "jp-001",
+        title: "Q1 T700 prepreg joint purchase",
+        material: "Carbon prepreg T700",
+        targetKg: 1000,
+        basePrice: 38.0,
+        tiers: [
+          { kg: 250, price: 36.5 },
+          { kg: 500, price: 35.2 },
+          { kg: 1000, price: 33.9 }
+        ],
+        raisedEur: 18200,
+        participants: 7,
+        deadline: "2026-02-15"
+      },
+      {
+        id: "jp-002",
+        title: "Epoxy 2K bulk buy (EU only)",
+        material: "Epoxy resin system 2K",
+        targetKg: 2000,
+        basePrice: 9.5,
+        tiers: [
+          { kg: 500, price: 9.1 },
+          { kg: 1200, price: 8.7 },
+          { kg: 2000, price: 8.2 }
+        ],
+        raisedEur: 6400,
+        participants: 4,
+        deadline: "2026-03-01"
+      },
+      {
+        id: "jp-003",
+        title: "Glass fabric 450 g/m² group order",
+        material: "Glass fabric 450 g/m²",
+        targetKg: 3000,
+        basePrice: 4.2,
+        tiers: [
+          { kg: 800, price: 4.0 },
+          { kg: 1600, price: 3.85 },
+          { kg: 3000, price: 3.6 }
+        ],
+        raisedEur: 5100,
+        participants: 9,
+        deadline: "2026-02-05"
+      }
+    ];
+
+    saveJointPurchase();
+  }
+
+  function saveJointPurchase() {
+    try {
+      localStorage.setItem(JP_STORAGE_KEY, JSON.stringify(jpCampaigns));
+    } catch (_) {}
+  }
+
+  function calcCurrentTier(c) {
+    // Convert raised € to estimated kg using basePrice (demo assumption)
+    const estKg = c.basePrice > 0 ? (c.raisedEur / c.basePrice) : 0;
+
+    // Find best tier reached
+    let best = { kg: 0, price: c.basePrice };
+    (c.tiers || []).forEach((t) => {
+      if (estKg >= t.kg && t.kg >= best.kg) best = t;
+    });
+    return { estKg, tierKg: best.kg, tierPrice: best.price };
+  }
+
+  function renderJointPurchases() {
+    if (!jpListEl) return;
+
+    jpListEl.innerHTML = "";
+
+    jpCampaigns.forEach((c) => {
+      const { estKg, tierKg, tierPrice } = calcCurrentTier(c);
+      const progress = Math.max(0, Math.min(100, (estKg / c.targetKg) * 100));
+
+      const item = document.createElement("div");
+      item.className = "jp-item" + (c.id === jpSelectedId ? " selected" : "");
+      item.setAttribute("data-id", c.id);
+
+      const deadlineTxt = c.deadline ? new Date(c.deadline).toLocaleDateString("nl-NL") : "—";
+
+      item.innerHTML = `
+        <div class="jp-item-header">
+          <div>
+            <div class="jp-title">${c.title}</div>
+            <div class="jp-sub">${c.material} • Target ${c.targetKg.toLocaleString("nl-NL")} kg • Deadline ${deadlineTxt}</div>
+          </div>
+          <div class="jp-badges">
+            <span class="jp-badge">Tier: ${tierKg ? `${tierKg}kg` : "Base"}</span>
+            <span class="jp-badge">${eur.format(tierPrice)}/kg</span>
+            <span class="jp-badge">${c.participants} participants</span>
+          </div>
+        </div>
+
+        <div class="jp-progress">
+          <div class="jp-progressbar"><div class="jp-progressfill" style="width:${progress.toFixed(0)}%"></div></div>
+          <div class="jp-metrics">
+            <span>Raised: ${eur.format(c.raisedEur)}</span>
+            <span>Progress: ${progress.toFixed(0)}%</span>
+          </div>
+        </div>
+      `;
+
+      item.addEventListener("click", () => {
+        jpSelectedId = c.id;
+        renderJointPurchases();
+        renderSelectedCampaign();
+      });
+
+      jpListEl.appendChild(item);
+    });
+
+    renderSelectedCampaign();
+  }
+
+  function renderSelectedCampaign() {
+    if (!jpSelectedEl) return;
+
+    const c = jpCampaigns.find((x) => x.id === jpSelectedId);
+    if (!c) {
+      jpSelectedEl.textContent = "Select a campaign on the left to see details here.";
+      return;
+    }
+
+    const { estKg, tierKg, tierPrice } = calcCurrentTier(c);
+    const progress = Math.max(0, Math.min(100, (estKg / c.targetKg) * 100));
+
+    const tiers = (c.tiers || [])
+      .map((t) => `• ${t.kg} kg → ${eur.format(t.price)}/kg`)
+      .join("<br/>");
+
+    jpSelectedEl.innerHTML = `
+      <strong>${c.title}</strong><br/>
+      Material: ${c.material}<br/>
+      Target: ${c.targetKg.toLocaleString("nl-NL")} kg<br/>
+      Raised: ${eur.format(c.raisedEur)} (≈ ${estKg.toFixed(0)} kg)<br/>
+      Current tier: <strong>${tierKg ? `${tierKg} kg` : "Base"}</strong> at <strong>${eur.format(tierPrice)}/kg</strong><br/>
+      Progress: ${progress.toFixed(0)}%<br/><br/>
+      <span style="color:#9ca3af">Pricing tiers:</span><br/>
+      ${tiers || "—"}
+    `;
+  }
+
+  if (jpCreateForm) {
+    jpCreateForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (jpCreateMsg) jpCreateMsg.textContent = "";
+
+      if (!currentUser) {
+        if (jpCreateMsg) jpCreateMsg.textContent = "Log eerst in om een campaign te maken.";
+        return;
+      }
+
+      const title = jpTitleInput?.value.trim();
+      const material = jpMaterialInput?.value;
+      const targetKg = parseFloat(jpTargetKgInput?.value || "0");
+      const basePrice = parseFloat(jpBasePriceInput?.value || "0");
+
+      if (!title || !material || !targetKg || !basePrice) {
+        if (jpCreateMsg) jpCreateMsg.textContent = "Vul alle velden correct in.";
+        return;
+      }
+
+      const id = `jp-${Date.now()}`;
+      const newCampaign = {
+        id,
+        title,
+        material,
+        targetKg,
+        basePrice,
+        tiers: [
+          { kg: Math.max(100, Math.round(targetKg * 0.25)), price: +(basePrice * 0.96).toFixed(2) },
+          { kg: Math.max(200, Math.round(targetKg * 0.5)), price: +(basePrice * 0.92).toFixed(2) },
+          { kg: Math.max(300, Math.round(targetKg * 1.0)), price: +(basePrice * 0.88).toFixed(2) }
+        ],
+        raisedEur: 0,
+        participants: 1,
+        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 21).toISOString().slice(0, 10) // +21 days
+      };
+
+      jpCampaigns.unshift(newCampaign);
+      jpSelectedId = id;
+      saveJointPurchase();
+      renderJointPurchases();
+
+      jpCreateForm.reset();
+      // Zet defaults terug (gebruiksvriendelijk)
+      if (jpTargetKgInput) jpTargetKgInput.value = "500";
+      if (jpBasePriceInput) jpBasePriceInput.value = "38";
+
+      if (jpCreateMsg) jpCreateMsg.textContent = "Campaign created. Select it and join to add contributions.";
+    });
+  }
+
+  if (jpJoinForm) {
+    jpJoinForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (jpJoinMsg) jpJoinMsg.textContent = "";
+
+      if (!currentUser) {
+        if (jpJoinMsg) jpJoinMsg.textContent = "Log eerst in om mee te doen.";
+        return;
+      }
+
+      const c = jpCampaigns.find((x) => x.id === jpSelectedId);
+      if (!c) {
+        if (jpJoinMsg) jpJoinMsg.textContent = "Select eerst een campaign links.";
+        return;
+      }
+
+      const amount = parseFloat(jpAmountInput?.value || "0");
+      if (!amount || amount < 50) {
+        if (jpJoinMsg) jpJoinMsg.textContent = "Minimale bijdrage is €50.";
+        return;
+      }
+
+      c.raisedEur = +(c.raisedEur + amount).toFixed(2);
+      c.participants = (c.participants || 0) + 1;
+
+      saveJointPurchase();
+      renderJointPurchases();
+
+      if (jpJoinForm) jpJoinForm.reset();
+      if (jpJoinMsg) jpJoinMsg.textContent = `Joined. Contribution recorded: ${eur.format(amount)}.`;
+    });
+  }
+
+  // Render groups even before login (safe)
+  renderGroupList();
   syncCartToUI();
 });
-
-// =====================================================
-// OPTIONAL: SEED COMPANIES & CERTIFICATES (blijft werken)
-// =====================================================
-const companiesSeed = {
-  "toray-nijverdal": {
-    company: {
-      name: "Toray Advanced Composites Netherlands B.V.",
-      street: "G. van der Muelenweg 2",
-      postalCode: "7443 RE",
-      city: "Nijverdal",
-      country: "Netherlands",
-      website: "https://www.toraytac.com",
-      sectors: ["Aerospace", "Industrial"],
-      mainCertificates: ["EN 9100", "ISO 9001"],
-      continent: "Europe"
-    },
-    certificates: {
-      en9100: {
-        standard: "EN 9100:2018 / AS9100D",
-        type: "Quality management - aerospace",
-        issuer: "LRQA",
-        site: "Nijverdal, NL",
-        scopeShort: "Prepregs & laminated composites for aerospace and industrial applications",
-        downloadUrl: ""
-      },
-      iso9001: {
-        standard: "ISO 9001:2015",
-        type: "Quality management",
-        issuer: "LRQA",
-        site: "Nijverdal, NL",
-        scopeShort: "Quality management system for composite material production"
-      }
-    }
-  }
-  // (Laat de rest van je seed zoals je het had; je kan het eronder plakken)
-};
-
-function setSeedStatus(text) {
-  if (window.updateSeedStatus) window.updateSeedStatus(text);
-  console.log(text);
-}
-
-window.seedCompaniesAndCertificates = async function () {
-  try {
-    setSeedStatus("Bezig met seeden...");
-
-    const ops = [];
-    for (const [companyId, data] of Object.entries(companiesSeed)) {
-      const company = data.company;
-      const certs = data.certificates || {};
-
-      const companyRef = db.collection("companies").doc(companyId);
-      ops.push(companyRef.set(company, { merge: true }));
-
-      for (const [certId, certData] of Object.entries(certs)) {
-        const certRef = companyRef.collection("certificates").doc(certId);
-        ops.push(certRef.set(certData, { merge: true }));
-      }
-    }
-
-    await Promise.all(ops);
-    setSeedStatus("Klaar! Bedrijven en certificaten staan nu in Firestore.");
-  } catch (err) {
-    console.error(err);
-    setSeedStatus("Fout bij seeden: " + err.message);
-  }
-};
