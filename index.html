@@ -9,7 +9,6 @@
   <meta name="description" content="CompoLink – connect EU composite buyers & suppliers in one platform." />
   <meta name="theme-color" content="#0b1020" />
 
-  <!-- Fonts (sneller laden) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -46,12 +45,7 @@
         </label>
         <label>
           Wachtwoord
-          <input
-            type="password"
-            id="login-password"
-            autocomplete="current-password"
-            required
-          />
+          <input type="password" id="login-password" autocomplete="current-password" required />
         </label>
         <p id="login-error" class="auth-error" aria-live="polite"></p>
         <button type="submit" class="primary-btn">Log in</button>
@@ -69,12 +63,7 @@
         </label>
         <label>
           Wachtwoord
-          <input
-            type="password"
-            id="signup-password"
-            autocomplete="new-password"
-            required
-          />
+          <input type="password" id="signup-password" autocomplete="new-password" required />
         </label>
 
         <fieldset class="role-fieldset">
@@ -97,7 +86,6 @@
 
   <!-- ============ APP (NA INLOGGEN) ============ -->
   <div id="app" class="app hidden">
-    <!-- TOP NAV -->
     <header class="top-nav">
       <div class="nav-left">
         <span class="nav-logo">CompoLink</span>
@@ -119,7 +107,6 @@
       </div>
     </header>
 
-    <!-- GLOBAL LIVE KOERSEN STRIP -->
     <div id="market-strip" class="market-strip">
       <span class="market-strip-label">Live material prices</span>
       <ul id="market-prices-strip" class="market-prices-strip"></ul>
@@ -129,143 +116,9 @@
     </div>
 
     <main class="main-wrapper">
-      <!-- ===== OVERVIEW ===== -->
-      <section id="overview" class="page active-page">
-        <div class="hero-shell">
-          <div class="hero-card">
-            <p class="hero-kicker">
-              YOUR DIGITAL MARKETPLACE FOR COMPOSITE MATERIALS
-            </p>
-            <h1 class="hero-title">
-              Connect buyers and suppliers of<br />composite materials.
-            </h1>
-            <p class="hero-text">
-              CompoLink brings together European composite suppliers on a single
-              platform. Buyers can instantly see which materials are in stock,
-              including price, quality, lead time, and certifications – with
-              complete transparency.
-            </p>
-
-            <div class="hero-actions">
-              <button class="hero-btn primary-btn" type="button" data-page="stock">
-                View stock
-              </button>
-              <button class="hero-btn ghost-btn" type="button" data-page="community">
-                Community feed
-              </button>
-            </div>
-
-            <div class="hero-tags">
-              <span class="hero-tag">RFID track &amp; trace</span>
-              <span class="hero-tag">Min / max orders</span>
-              <span class="hero-tag">Real-time stock insight</span>
-              <span class="hero-tag">5% platform fee</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== STOCK PAGE ===== -->
-      <section id="stock" class="page">
-        <h2>Stock overview</h2>
-        <p class="page-intro">
-          Live material prices links, gecombineerd met actuele stockdata in het
-          CompoLink netwerk.
-        </p>
-
-        <div class="stock-layout">
-          <aside class="prices-panel">
-            <h3>Live material prices</h3>
-            <ul id="market-prices-card" class="market-prices-list"></ul>
-            <p class="market-note">
-              Indicatieve spotprijzen (goud, zilver, etc.) in USD. Automatisch
-              ververst (demo).
-            </p>
-          </aside>
-
-          <div class="stock-panel">
-            <div class="stock-table-card">
-              <h3>Material list</h3>
-              <table class="stock-table">
-                <thead>
-                  <tr>
-                    <th>Materiaal</th>
-                    <th>Prijs €/kg</th>
-                    <th>Beschikbaar (kg)</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr data-item='{"id":"mat-carbon","name":"Carbon prepreg T700","price":38,"weight":50}'>
-                    <td>Carbon prepreg T700</td>
-                    <td>€38,00</td>
-                    <td>1500</td>
-                    <td>
-                      <button type="button" class="add-to-cart">In mandje</button>
-                    </td>
-                  </tr>
-                  <tr data-item='{"id":"mat-epoxy","name":"Epoxy resin system 2K","price":9.5,"weight":25}'>
-                    <td>Epoxy resin system 2K</td>
-                    <td>€9,50</td>
-                    <td>3200</td>
-                    <td>
-                      <button type="button" class="add-to-cart">In mandje</button>
-                    </td>
-                  </tr>
-                  <tr data-item='{"id":"mat-glass","name":"Glass fabric 450 g/m²","price":4.2,"weight":30}'>
-                    <td>Glass fabric 450 g/m²</td>
-                    <td>€4,20</td>
-                    <td>7800</td>
-                    <td>
-                      <button type="button" class="add-to-cart">In mandje</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <aside class="cart-card">
-              <h3>Mini-cart</h3>
-              <ul id="cart-items" class="cart-items"></ul>
-              <p id="cart-empty-msg" class="muted">Je mandje is nog leeg.</p>
-              <p>Totaal gewicht: <span id="cart-weight">0.0</span> kg</p>
-              <p>Materiaalprijs: €<span id="cart-total">0.00</span></p>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== BUYERS & SUPPLIERS ===== -->
-      <section id="buyers" class="page">
-        <div class="card">
-          <h2>Buyers &amp; Suppliers</h2>
-          <p class="page-intro">
-            Hier kun je later supplier-profielen, certificaten en matching
-            logica tonen. Voor nu is dit een nette placeholder.
-          </p>
-        </div>
-      </section>
-
-      <!-- ===== ANALYTICS ===== -->
-      <section id="analytics" class="page">
-        <h2>Analytics</h2>
-        <p class="page-intro">Demo-visualisatie van volumes per materiaaltype.</p>
-        <div class="card">
-          <div class="chart-wrapper">
-            <canvas id="stockChart"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== TRACKING ===== -->
-      <section id="tracking" class="page">
-        <div class="card">
-          <h2>Tracking</h2>
-          <p class="page-intro">
-            Trackingpagina voor toekomstige RFID / shipment tracking. Nu nog placeholder.
-          </p>
-        </div>
-      </section>
+      <!-- (jouw content blijft hetzelfde; ik laat hem hier weg om niet 2x te spammen) -->
+      <!-- BELANGRIJK: laat jouw sections precies zoals je ze had -->
+      <!-- ... -->
 
       <!-- ===== COMMUNITY FEED ===== -->
       <section id="community" class="page">
@@ -284,9 +137,7 @@
 
               <div class="community-main">
                 <div class="community-header">
-                  <h3>
-                    Post an update in <span id="current-group-name">Market updates</span>
-                  </h3>
+                  <h3>Post an update in <span id="current-group-name">Market updates</span></h3>
                 </div>
 
                 <div id="post-feed" class="post-feed"></div>
@@ -309,84 +160,7 @@
         </div>
       </section>
 
-      <!-- ===== CHECKOUT ===== -->
-      <section id="checkout" class="page">
-        <div class="checkout-shell">
-          <div class="checkout-card">
-            <h2>Checkout &amp; Shipping Costs (Demo)</h2>
-            <p class="page-intro">
-              This demo shows how shipping costs can be automatically
-              calculated based on destination and total weight. Rates are
-              approximations inspired by PostNL, but <strong>not live or official prices</strong>.
-            </p>
-
-            <div class="checkout-grid">
-              <div class="checkout-left">
-                <h3>Shipping information</h3>
-                <form id="shipping-form" class="shipping-form">
-                  <label>
-                    Name
-                    <input type="text" id="ship-name" placeholder="Recipient name" />
-                  </label>
-                  <label>
-                    E-mail
-                    <input type="email" id="ship-email" placeholder="ontvanger@bedrijf.com" />
-                  </label>
-                  <label>
-                    Address
-                    <input type="text" id="ship-address" placeholder="Street + house number" />
-                  </label>
-                  <label>
-                    Postcode
-                    <input type="text" id="ship-postcode" placeholder="For example 2525 CP" />
-                  </label>
-                  <label>
-                    City
-                    <input type="text" id="ship-city" placeholder="The Hague" />
-                  </label>
-                  <label>
-                    Land / regio
-                    <select id="ship-region">
-                      <option value="NL">The Netherlands</option>
-                      <option value="EU">European Union</option>
-                      <option value="WORLD">Worldwide</option>
-                    </select>
-                  </label>
-                  <label>
-                    Total weight (kg)
-                    <input
-                      type="number"
-                      id="ship-weight"
-                      step="0.1"
-                      min="0"
-                      placeholder="Will be filled in automatically"
-                    />
-                  </label>
-                  <button type="submit" class="primary-btn full-width">
-                    Calculate shipping costs
-                  </button>
-                </form>
-              </div>
-
-              <div class="checkout-right">
-                <h3>Summary order</h3>
-                <div class="summary-lines">
-                  <p><span>Material price</span><span>€ <span id="summary-material">0.00</span></span></p>
-                  <p><span>Shipping costs (demo)</span><span>€ <span id="summary-shipping">0.00</span></span></p>
-                  <hr />
-                  <p class="summary-total-row"><span>Total</span><span>€ <span id="summary-total">0.00</span></span></p>
-                </div>
-                <p class="summary-text">
-                  Shipping rates in this demo:<br />
-                  NL: up to 10 kg ≈ €7, then increments per 10 kg.<br />
-                  EU: higher base price, Worldwide: even higher.<br />
-                  For a true integration, an official PostNL/carrier API is required.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <!-- ... -->
     </main>
 
     <footer class="app-footer">
@@ -396,47 +170,38 @@
 
   <!-- ================= SCRIPTS (juiste volgorde) ================= -->
 
-  <!-- Firebase v8 CDN (eerst libraries) -->
+  <!-- Firebase v8 CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- Firebase init (daarna pas initialiseren) -->
+  <!-- Firebase init: GEEN globale "firebaseConfig" variabele (voorkomt conflict met script.js) -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
-      authDomain: "compolink-112.firebaseapp.com",
-      projectId: "compolink-112",
+    (function initFirebase() {
+      const cfg = {
+        apiKey: "AIzaSyA2BScDGFFpNaLTn7d5wpbDjLjAWe6eVXY",
+        authDomain: "compolink-112.firebaseapp.com",
+        projectId: "compolink-112",
+        storageBucket: "compolink-112.firebasestorage.app",
+        messagingSenderId: "1045338539276",
+        appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
+        measurementId: "G-VF4TTS8CJD"
+      };
 
-      /*
-        Let op:
-        Vaak is storageBucket: "compolink-112.appspot.com"
-        Als jouw Firebase Console EXACT "compolink-112.firebasestorage.app" geeft, laat het zo.
-        Als uploads niet werken, vervang dit door: "compolink-112.appspot.com"
-      */
-      storageBucket: "compolink-112.firebasestorage.app",
-
-      messagingSenderId: "1045338539276",
-      appId: "1:1045338539276:web:7dbc0b80b0889dd3dd7529",
-      measurementId: "G-VF4TTS8CJD"
-    };
-
-    // Guard tegen dubbel initialiseren
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    console.log("Firebase ready:", firebase.app().options.projectId);
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      console.log("Firebase ready:", firebase.app().options.projectId);
+    })();
   </script>
 
-  <!-- Chart.js (moet vóór script.js, omdat script.js Chart gebruikt) -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- JOUW HOOFDLOGICA -->
   <script src="script.js" defer></script>
 
-  <!-- LIVE KOERSEN: STRIP + CARD (GOLD/SILVER/...) -->
-  <script defer>
+  <!-- LIVE KOERSEN -->
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
       const stripList = document.getElementById("market-prices-strip");
       const cardList = document.getElementById("market-prices-card");
@@ -480,10 +245,7 @@
 
           data.forEach(([symbol, price]) => {
             if (symbols.includes(String(symbol).toLowerCase())) {
-              items.push({
-                symbol: String(symbol).toUpperCase(),
-                price: Number(price)
-              });
+              items.push({ symbol: String(symbol).toUpperCase(), price: Number(price) });
             }
           });
 
@@ -496,8 +258,9 @@
       }
 
       loadPrices();
-      setInterval(loadPrices, 600000); // elke 10 minuten
+      setInterval(loadPrices, 600000);
     });
   </script>
 </body>
 </html>
+
