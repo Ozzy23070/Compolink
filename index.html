@@ -109,6 +109,7 @@
         <button class="nav-btn" type="button" data-page="analytics">Analytics</button>
         <button class="nav-btn" type="button" data-page="tracking">Tracking</button>
         <button class="nav-btn" type="button" data-page="community">Community feed</button>
+        <button class="nav-btn" type="button" data-page="joint">Joint purchase</button>
         <button class="nav-btn" type="button" data-page="checkout">Checkout</button>
       </nav>
 
@@ -299,6 +300,84 @@
           </div>
         </div>
       </section>
+<!-- ===== JOINT PURCHASE ===== -->
+<section id="joint" class="page">
+  <div class="joint-shell">
+    <div class="joint-header">
+      <h2>Joint purchase</h2>
+      <p class="page-intro">
+        Pool demand with other buyers to unlock better pricing tiers. Suppliers can respond with lead time and MOQ.
+        (Demo)
+      </p>
+    </div>
+
+    <div class="joint-layout">
+      <!-- LEFT: campaigns -->
+      <div class="joint-card">
+        <div class="jp-top">
+          <h3>Active group-buys</h3>
+          <div class="jp-steps" aria-label="Joint purchase steps">
+            <div class="jp-step active">1. Select</div>
+            <div class="jp-step">2. Contribute</div>
+            <div class="jp-step">3. Confirm</div>
+          </div>
+        </div>
+
+        <div id="jp-list" class="jp-list"></div>
+      </div>
+
+      <!-- RIGHT: create + join -->
+      <div class="joint-card">
+        <h3>Create a joint purchase</h3>
+        <form id="jp-create-form" class="jp-form">
+          <label>
+            Material
+            <select id="jp-material" required>
+              <option value="Carbon prepreg T700">Carbon prepreg T700</option>
+              <option value="Epoxy resin system 2K">Epoxy resin system 2K</option>
+              <option value="Glass fabric 450 g/m²">Glass fabric 450 g/m²</option>
+            </select>
+          </label>
+
+          <div class="jp-form-grid">
+            <label>
+              Target (kg)
+              <input id="jp-target-kg" type="number" min="50" step="10" value="500" required />
+            </label>
+            <label>
+              Baseline price (€/kg)
+              <input id="jp-base-price" type="number" min="0.1" step="0.1" value="38" required />
+            </label>
+          </div>
+
+          <label>
+            Campaign title
+            <input id="jp-title" type="text" placeholder="e.g., Q1 T700 prepreg group buy" required />
+          </label>
+
+          <button type="submit" class="primary-btn">Create campaign</button>
+          <p id="jp-create-msg" class="muted" style="margin:0.4rem 0 0;"></p>
+        </form>
+
+        <div class="jp-divider"></div>
+
+        <h3>Join selected campaign</h3>
+        <div id="jp-selected" class="jp-selected muted">
+          Select a campaign on the left to see details here.
+        </div>
+
+        <form id="jp-join-form" class="jp-form">
+          <label>
+            Contribution (€)
+            <input id="jp-amount" type="number" min="50" step="50" placeholder="e.g., 500" required />
+          </label>
+          <button type="submit" class="primary-btn">Join &amp; reserve</button>
+          <p id="jp-join-msg" class="muted" style="margin:0.4rem 0 0;"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
 
       <!-- ===== CHECKOUT ===== -->
       <section id="checkout" class="page">
