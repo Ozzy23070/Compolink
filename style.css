@@ -945,33 +945,30 @@ h3 {
   cursor: pointer;
 }
 
-/* MOBIEL */
-@media (max-width: 768px) {
-  .nav-center {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 70px;
-    right: 16px;
-    background: #020617;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    z-index: 1000;
-  }
-
-  .nav-center.active {
-    display: flex;
-  }
-
-  .hamburger {
-    display: block;
-  }
-}
+/* TOP NAV basis */
 .top-nav {
-  position: relative; /* belangrijk: anchor voor absolute menu */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-/* basis: hamburger standaard uit op desktop */
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Desktop nav */
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hamburger default (desktop uit) */
 .hamburger {
   display: none;
   font-size: 1.8rem;
@@ -988,24 +985,30 @@ h3 {
   }
 
   .nav-center {
-    display: none;              /* dicht */
+    display: none;            /* dicht */
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: stretch;
+    gap: 10px;
 
-    position: fixed;            /* FIXED = altijd zichtbaar in viewport */
-    top: 64px;                  /* pas aan als je header hoger is */
+    position: fixed;          /* altijd zichtbaar in viewport */
+    top: 70px;                /* pas aan als je header hoger/lager is */
     left: 16px;
     right: 16px;
 
     background: #020617;
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 0.75rem;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 12px;
 
-    z-index: 9999;              /* boven alles */
+    z-index: 9999;
   }
 
   .nav-center.active {
-    display: flex;              /* open */
+    display: flex;            /* open */
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: left;
   }
 }
