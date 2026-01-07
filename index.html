@@ -95,13 +95,11 @@
   </div>
 
   <!-- ============ APP (NA INLOGGEN) ============ -->
-  <div id="app" class="app hidden">
- <!-- TOP NAV -->
 <header class="top-nav">
   <div class="nav-left">
     <button
-      class="hamburger"
       id="hamburgerBtn"
+      class="hamburger"
       type="button"
       aria-label="Open menu"
       aria-expanded="false"
@@ -112,6 +110,17 @@
 
     <span class="nav-logo">CompoLink</span>
   </div>
+
+  <!-- DIT is de nav die open/dicht gaat -->
+  <nav id="primaryNav" class="nav-center" aria-label="Primary navigation">
+    <!-- je menu buttons -->
+  </nav>
+
+  <div class="nav-right">
+    <span id="user-tag">–</span>
+    <button id="logout-btn" type="button">Log out</button>
+  </div>
+</header>
 
   <nav id="primaryNav" class="nav-center" aria-label="Primary navigation">
     <button class="nav-btn active" type="button" data-page="overview">Overview</button>
