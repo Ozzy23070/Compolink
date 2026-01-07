@@ -845,13 +845,23 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGroupList();
   syncCartToUI();
 });
-document.getElementById("hamburgerBtn").addEventListener("click", () => {
-  document.querySelector(".nav-center").classList.toggle("active");
-});
-const burger = document.getElementById("hamburgerBtn");
-const nav = document.getElementById("primaryNav");
+document.addEventListener("DOMContentLoaded", () => {
+  // jouw bestaande init code (laat staan wat je al had)
+  renderGroupList();
+  syncCartToUI();
 
-burger.addEventListener("click", () => {
-  const isOpen = nav.classList.toggle("active");
-  burger.setAttribute("aria-expanded", String(isOpen));
+  // hamburger menu
+  const burger = document.getElementById("hamburgerBtn");
+  const nav = document.getElementById("primaryNav");
+
+  if (!burger || !nav) {
+    console.warn("Hamburger/nav niet gevonden:", { burger, nav });
+    return;
+  }
+
+  burger.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isOpen = nav.classList.toggle("active");
+    burger.setAttribute("aria-expanded", String(isOpen));
+  });
 });
