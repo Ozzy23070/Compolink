@@ -936,3 +936,34 @@ h3 {
     display: none;
   }
 }
+.hamburger {
+  display: none;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+/* MOBIEL */
+@media (max-width: 768px) {
+  .nav-center {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    right: 16px;
+    background: #020617;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    z-index: 1000;
+  }
+
+  .nav-center.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
