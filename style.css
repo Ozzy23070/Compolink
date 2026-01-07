@@ -1012,3 +1012,8 @@ h3 {
     text-align: left;
   }
 }
+.hamburger {
+  position: relative;
+  z-index: 10000;
+  pointer-events: auto;
+}
