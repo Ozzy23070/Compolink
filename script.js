@@ -845,3 +845,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGroupList();
   syncCartToUI();
 });
+document.getElementById("hamburgerBtn").addEventListener("click", () => {
+  document.querySelector(".nav-center").classList.toggle("active");
+});
