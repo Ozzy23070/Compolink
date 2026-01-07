@@ -967,3 +967,45 @@ h3 {
     display: block;
   }
 }
+.top-nav {
+  position: relative; /* belangrijk: anchor voor absolute menu */
+}
+
+/* basis: hamburger standaard uit op desktop */
+.hamburger {
+  display: none;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: #e5e7eb;
+  cursor: pointer;
+}
+
+/* MOBIEL */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .nav-center {
+    display: none;              /* dicht */
+    flex-direction: column;
+    gap: 0.75rem;
+
+    position: fixed;            /* FIXED = altijd zichtbaar in viewport */
+    top: 64px;                  /* pas aan als je header hoger is */
+    left: 16px;
+    right: 16px;
+
+    background: #020617;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0.75rem;
+    padding: 1rem;
+
+    z-index: 9999;              /* boven alles */
+  }
+
+  .nav-center.active {
+    display: flex;              /* open */
+  }
+}
