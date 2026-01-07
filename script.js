@@ -1,10 +1,37 @@
-// ======================================
-// Firebase services
-// ======================================
+// =====================================================
+// 0) FIREBASE INIT (V8 CDN) - VUL JE EIGEN CONFIG IN
+// =====================================================
+const firebaseConfig = {
+  apiKey: "VUL_HIER_IN",
+  authDomain: "VUL_HIER_IN",
+  projectId: "VUL_HIER_IN",
+  storageBucket: "VUL_HIER_IN",
+  messagingSenderId: "VUL_HIER_IN",
+  appId: "VUL_HIER_IN"
+};
+
+// Init only once
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+console.log("Firebase init OK:", firebase.app().options.projectId);
+
+// =====================================================
+// 1) Firebase services
+// =====================================================
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
+// Extra: vang async errors duidelijker
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("Unhandled promise rejection:", e.reason);
+});
+
+// =====================================================
+// 2) APP
+// =====================================================
 document.addEventListener("DOMContentLoaded", () => {
   // ====================================
   // DOM REFERENTIES
@@ -100,32 +127,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const baseName = currentUser.displayName || currentUser.email || "User";
-    const roleLabel = currentUserRole
-      ? currentUserRole.toUpperCase()
-      : "USER";
-
-    // Voorbeeld: "SELLER Oguzhan Ates"
+    const roleLabel = currentUserRole ? currentUserRole.toUpperCase() : "USER";
     userTag.textContent = `${roleLabel} ${baseName}`;
   }
 
   function parseFirebaseError(err) {
-    if (!err || !err.code) {
-      return "Er ging iets mis. Probeer het opnieuw.";
+    if (!err) return "Er ging iets mis. Probeer het opnieuw.";
+    if (err.code) {
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          return "Er bestaat al een account met dit e-mailadres.";
+        case "auth/invalid-email":
+          return "Dit is geen geldig e-mailadres.";
+        case "auth/weak-password":
+          return "Kies een sterker wachtwoord (minimaal 6 tekens).";
+        case "auth/user-not-found":
+        case "auth/wrong-password":
+          return "Onjuiste combinatie van e-mail en wachtwoord.";
+        default:
+          return `Er ging iets mis (${err.code}).`;
+      }
     }
-
-    switch (err.code) {
-      case "auth/email-already-in-use":
-        return "Er bestaat al een account met dit e-mailadres.";
-      case "auth/invalid-email":
-        return "Dit is geen geldig e-mailadres.";
-      case "auth/weak-password":
-        return "Kies een sterker wachtwoord (minimaal 6 tekens).";
-      case "auth/user-not-found":
-      case "auth/wrong-password":
-        return "Onjuiste combinatie van e-mail en wachtwoord.";
-      default:
-        return "Er ging iets mis (" + err.code + ").";
-    }
+    return err.message || "Er ging iets mis. Probeer het opnieuw.";
   }
 
   // ====================================
@@ -155,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Knoppen met data-page (bijv. op hero card)
   internalPageButtons.forEach((btn) => {
     if (!btn.classList.contains("nav-btn")) {
       btn.addEventListener("click", () => {
@@ -170,7 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // AUTH: LOGIN / SIGNUP / LOGOUT
   // ====================================
 
-  // Tabs wisselen
   if (loginTab && signupTab && loginForm && signupForm) {
     loginTab.addEventListener("click", () => {
       loginTab.classList.add("active");
@@ -191,38 +212,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Sign up
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (signupError) signupError.textContent = "";
 
       const name = document.getElementById("signup-name")?.value.trim();
-      const email = document
-        .getElementById("signup-email")
-        ?.value.trim()
-        .toLowerCase();
-      const password = document
-        .getElementById("signup-password")
-        ?.value.trim();
-      const roleInput = document.querySelector(
-        "input[name='signup-role']:checked"
-      );
+      const email = document.getElementById("signup-email")?.value.trim().toLowerCase();
+      const password = document.getElementById("signup-password")?.value.trim();
+      const roleInput = document.querySelector("input[name='signup-role']:checked");
       const role = roleInput ? roleInput.value : null;
 
       if (!name || !email || !password || !role) {
-        if (signupError) {
-          signupError.textContent =
-            "Vul alle velden in en kies een accounttype.";
-        }
+        if (signupError) signupError.textContent = "Vul alle velden in en kies een accounttype.";
         return;
       }
 
       try {
-        const cred = await auth.createUserWithEmailAndPassword(
-          email,
-          password
-        );
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
 
         if (cred.user && name) {
           await cred.user.updateProfile({ displayName: name });
@@ -235,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        if (signupError) signupError.textContent = "";
         signupForm.reset();
         alert("Account aangemaakt! Je kunt nu inloggen.");
         if (loginTab) loginTab.click();
@@ -246,21 +252,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Login
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (loginError) loginError.textContent = "";
 
-      const email = document
-        .getElementById("login-email")
-        ?.value.trim()
-        .toLowerCase();
+      const email = document.getElementById("login-email")?.value.trim().toLowerCase();
       const password = document.getElementById("login-password")?.value;
 
       if (!email || !password) {
-        if (loginError) loginError.textContent =
-          "Vul e-mail en wachtwoord in.";
+        if (loginError) loginError.textContent = "Vul e-mail en wachtwoord in.";
         return;
       }
 
@@ -273,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       auth.signOut().catch((err) => console.error(err));
@@ -309,13 +309,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateUserTag();
     showApp();
-    showPage("overview"); // start op overview
+    showPage("overview");
 
-    // Community initialiseren
     renderGroupList();
     subscribeToGroupFeed();
 
-    // Cart / analytics
     syncCartToUI();
     initAnalyticsChart();
   });
@@ -337,26 +335,17 @@ document.addEventListener("DOMContentLoaded", () => {
       totalPrice += item.totalPrice;
 
       const li = document.createElement("li");
-      li.textContent = `${item.name} – ${item.totalWeight.toFixed(
-        1
-      )} kg (€${item.totalPrice.toFixed(2)})`;
+      li.textContent = `${item.name} – ${item.totalWeight.toFixed(1)} kg (€${item.totalPrice.toFixed(2)})`;
       cartItemsEl.appendChild(li);
     });
 
     cartWeightEl.textContent = totalWeight.toFixed(1);
     cartTotalEl.textContent = totalPrice.toFixed(2);
 
-    // Checkout samenvatting mee laten lopen
-    if (summaryMaterialEl) {
-      summaryMaterialEl.textContent = totalPrice.toFixed(2);
-    }
-    if (shipWeightInput && totalWeight > 0) {
-      shipWeightInput.value = totalWeight.toFixed(1);
-    }
+    if (summaryMaterialEl) summaryMaterialEl.textContent = totalPrice.toFixed(2);
+    if (shipWeightInput && totalWeight > 0) shipWeightInput.value = totalWeight.toFixed(1);
 
-    if (cartEmptyMsgEl) {
-      cartEmptyMsgEl.style.display = cart.length === 0 ? "block" : "none";
-    }
+    if (cartEmptyMsgEl) cartEmptyMsgEl.style.display = cart.length === 0 ? "block" : "none";
   }
 
   addToCartButtons.forEach((btn) => {
@@ -401,24 +390,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let step = 0;
 
     switch (region) {
-      case "NL":
-        base = 7;
-        step = 4;
-        break;
-      case "EU":
-        base = 15;
-        step = 8;
-        break;
-      case "WORLD":
-        base = 25;
-        step = 12;
-        break;
-      default:
-        base = 7;
-        step = 4;
+      case "NL": base = 7; step = 4; break;
+      case "EU": base = 15; step = 8; break;
+      case "WORLD": base = 25; step = 12; break;
+      default: base = 7; step = 4;
     }
 
-    // tot 10 kg alleen basis; daarboven blokken van 10 kg
     if (weightKg <= 10) return base;
     const extraBlocks = Math.ceil((weightKg - 10) / 10);
     return base + extraBlocks * step;
@@ -430,19 +407,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const region = shipRegionInput ? shipRegionInput.value : "NL";
       const weight = parseFloat(shipWeightInput?.value || "0");
-      const materialTotal = parseFloat(
-        summaryMaterialEl?.textContent || "0"
-      );
+      const materialTotal = parseFloat(summaryMaterialEl?.textContent || "0");
 
       const shippingCost = calculateShipping(region, weight);
       const grandTotal = materialTotal + shippingCost;
 
-      if (summaryShippingEl) {
-        summaryShippingEl.textContent = shippingCost.toFixed(2);
-      }
-      if (summaryTotalEl) {
-        summaryTotalEl.textContent = grandTotal.toFixed(2);
-      }
+      if (summaryShippingEl) summaryShippingEl.textContent = shippingCost.toFixed(2);
+      if (summaryTotalEl) summaryTotalEl.textContent = grandTotal.toFixed(2);
     });
   }
 
@@ -452,47 +423,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function initAnalyticsChart() {
     if (!stockChartCanvas || typeof Chart === "undefined") return;
-
-    if (stockChartInstance) {
-      return; // al aangemaakt
-    }
+    if (stockChartInstance) return;
 
     const ctx = stockChartCanvas.getContext("2d");
-
     stockChartInstance = new Chart(ctx, {
       type: "bar",
       data: {
-        labels: [
-          "Carbon prepreg T700",
-          "Epoxy hars 2K",
-          "Glass fabric 450 g/m²"
-        ],
-        datasets: [
-          {
-            label: "Stock (kg)",
-            data: [1500, 3200, 7800]
-          }
-        ]
+        labels: ["Carbon prepreg T700", "Epoxy hars 2K", "Glass fabric 450 g/m²"],
+        datasets: [{ label: "Stock (kg)", data: [1500, 3200, 7800] }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: "#e5e7eb"
-            }
-          }
-        },
+        plugins: { legend: { labels: { color: "#e5e7eb" } } },
         scales: {
-          x: {
-            ticks: { color: "#e5e7eb" },
-            grid: { display: false }
-          },
-          y: {
-            ticks: { color: "#e5e7eb" },
-            grid: { color: "rgba(148,163,184,0.3)" }
-          }
+          x: { ticks: { color: "#e5e7eb" }, grid: { display: false } },
+          y: { ticks: { color: "#e5e7eb" }, grid: { color: "rgba(148,163,184,0.3)" } }
         }
       }
     });
@@ -504,15 +450,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderGroupList() {
     if (!groupListEl) return;
-
     groupListEl.innerHTML = "";
 
     GROUPS.forEach((group) => {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className =
-        "group-btn" + (group.id === activeGroupId ? " active" : "");
+      btn.className = "group-btn" + (group.id === activeGroupId ? " active" : "");
       btn.textContent = group.label;
 
       btn.addEventListener("click", () => {
@@ -527,14 +471,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const active = GROUPS.find((g) => g.id === activeGroupId) || GROUPS[0];
-    if (currentGroupNameEl && active) {
-      currentGroupNameEl.textContent = active.label;
-    }
+    if (currentGroupNameEl && active) currentGroupNameEl.textContent = active.label;
   }
 
   function renderPostsSnapshot(snapshot) {
     if (!postFeed) return;
-
     postFeed.innerHTML = "";
 
     if (snapshot.empty) {
@@ -562,16 +503,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.createdAt && data.createdAt.toDate) {
         const d = data.createdAt.toDate();
         timeText =
-          d.toLocaleDateString("nl-NL", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit"
-          }) +
+          d.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit", year: "2-digit" }) +
           " " +
-          d.toLocaleTimeString("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
+          d.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
       }
       timeEl.textContent = timeText;
 
@@ -609,12 +543,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function subscribeToGroupFeed() {
-    if (!db || !postFeed) return;
+    if (!postFeed) return;
 
     if (postsUnsubscribe) {
       postsUnsubscribe();
       postsUnsubscribe = null;
     }
+
+    console.log("Subscribing to posts:", activeGroupId);
 
     postsUnsubscribe = db
       .collection("posts")
@@ -622,20 +558,22 @@ document.addEventListener("DOMContentLoaded", () => {
       .orderBy("createdAt", "desc")
       .limit(100)
       .onSnapshot(
-        (snapshot) => {
-          renderPostsSnapshot(snapshot);
-        },
-        (err) => {
-          console.error("Post feed error:", err);
-        }
+        (snapshot) => renderPostsSnapshot(snapshot),
+        (err) => console.error("Post feed error:", err)
       );
   }
 
+  // POSTEN (met duidelijke status + disable)
   if (postForm && postText && postFile) {
     postForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const submitBtn = postForm.querySelector("button[type='submit'], #postBtn");
+      if (submitBtn) submitBtn.disabled = true;
+
       if (!currentUser) {
         alert("Log eerst in om een update te plaatsen.");
+        if (submitBtn) submitBtn.disabled = false;
         return;
       }
 
@@ -644,6 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!text && !file) {
         alert("Schrijf een update of voeg een bestand toe.");
+        if (submitBtn) submitBtn.disabled = false;
         return;
       }
 
@@ -652,14 +591,21 @@ document.addEventListener("DOMContentLoaded", () => {
       let fileType = null;
 
       try {
+        // Upload (als er file is)
         if (file) {
-          const path = `posts/${currentUser.uid}/${Date.now()}_${file.name}`;
+          // Gebruik community/<uid>/... (consistent met nette Storage rules)
+          const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+          const path = `community/${currentUser.uid}/${Date.now()}_${safeName}`;
           const ref = storage.ref().child(path);
+
+          console.log("Uploading file to:", path);
           const snapshot = await ref.put(file);
           fileUrl = await snapshot.ref.getDownloadURL();
           fileName = file.name;
-          fileType = file.type.startsWith("image/") ? "image" : "file";
+          fileType = file.type && file.type.startsWith("image/") ? "image" : "file";
         }
+
+        console.log("Writing Firestore post:", { groupId: activeGroupId });
 
         await db.collection("posts").add({
           text,
@@ -668,17 +614,19 @@ document.addEventListener("DOMContentLoaded", () => {
           fileType,
           groupId: activeGroupId,
           userId: currentUser.uid,
-          userName:
-            currentUser.displayName || currentUser.email || "User",
+          userName: currentUser.displayName || currentUser.email || "User",
           role: currentUserRole || "buyer",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
         postText.value = "";
         postFile.value = "";
+        console.log("Post placed OK");
       } catch (err) {
         console.error("Fout bij plaatsen post:", err);
         alert("Plaatsen mislukt: " + (err.message || "onbekende fout"));
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     });
   }
@@ -690,10 +638,9 @@ document.addEventListener("DOMContentLoaded", () => {
   syncCartToUI();
 });
 
-// ======================================
-// OPTIONAL: SEED COMPANIES & CERTIFICATES
-// ======================================
-
+// =====================================================
+// OPTIONAL: SEED COMPANIES & CERTIFICATES (blijft werken)
+// =====================================================
 const companiesSeed = {
   "toray-nijverdal": {
     company: {
@@ -713,8 +660,7 @@ const companiesSeed = {
         type: "Quality management - aerospace",
         issuer: "LRQA",
         site: "Nijverdal, NL",
-        scopeShort:
-          "Prepregs & laminated composites for aerospace and industrial applications",
+        scopeShort: "Prepregs & laminated composites for aerospace and industrial applications",
         downloadUrl: ""
       },
       iso9001: {
@@ -722,114 +668,23 @@ const companiesSeed = {
         type: "Quality management",
         issuer: "LRQA",
         site: "Nijverdal, NL",
-        scopeShort:
-          "Quality management system for composite material production"
-      }
-    }
-  },
-
-  "sgl-meitingen": {
-    company: {
-      name: "SGL Carbon GmbH",
-      street: "Werner-von-Siemens-Straße 18",
-      postalCode: "86405",
-      city: "Meitingen",
-      country: "Germany",
-      website: "https://www.sglcarbon.com",
-      sectors: ["Aerospace", "Automotive", "Energy"],
-      mainCertificates: ["ISO 9001", "ISO 14001", "ISO 45001"],
-      continent: "Europe"
-    },
-    certificates: {
-      iso9001: {
-        standard: "ISO 9001:2015",
-        type: "Quality management",
-        issuer: "TÜV",
-        site: "Meitingen, DE",
-        scopeShort:
-          "Quality management for carbon and graphite products"
-      },
-      iso14001: {
-        standard: "ISO 14001:2015",
-        type: "Environmental management",
-        issuer: "TÜV",
-        site: "Meitingen, DE",
-        scopeShort:
-          "Environmental management system for production sites"
-      }
-    }
-  },
-
-  "gurit-uk": {
-    company: {
-      name: "Gurit (UK) Ltd",
-      street: "St Cross Business Park",
-      postalCode: "PO30 5WU",
-      city: "Newport, Isle of Wight",
-      country: "United Kingdom",
-      website: "https://www.gurit.com",
-      sectors: ["Wind", "Marine", "Aerospace"],
-      mainCertificates: ["ISO 9001", "ISO 14001", "ISO 45001"],
-      continent: "Europe"
-    },
-    certificates: {
-      iso9001: {
-        standard: "ISO 9001:2015",
-        type: "Quality management",
-        issuer: "LRQA",
-        site: "UK sites",
-        scopeShort:
-          "Quality management for composite materials and adhesives"
-      }
-    }
-  },
-
-  "porcher-fr": {
-    company: {
-      name: "Porcher Industries",
-      street: "75 Route Départementale 1085",
-      postalCode: "38300",
-      city: "Eclose-Badinières",
-      country: "France",
-      website: "https://www.porcher-ind.com",
-      sectors: ["Technical textiles", "Thermoplastic composites"],
-      mainCertificates: ["ISO 50001", "ISO 9001 (sites)"],
-      continent: "Europe"
-    },
-    certificates: {
-      iso50001: {
-        standard: "ISO 50001",
-        type: "Energy management",
-        issuer: "AFNOR",
-        site: "French sites",
-        scopeShort:
-          "Energy management system for industrial sites"
+        scopeShort: "Quality management system for composite material production"
       }
     }
   }
+  // (Laat de rest van je seed zoals je het had; je kan het eronder plakken)
 };
 
 function setSeedStatus(text) {
-  if (window.updateSeedStatus) {
-    window.updateSeedStatus(text);
-  }
+  if (window.updateSeedStatus) window.updateSeedStatus(text);
   console.log(text);
 }
 
-// Aanroepbaar vanuit console: window.seedCompaniesAndCertificates()
 window.seedCompaniesAndCertificates = async function () {
   try {
-    if (!db) {
-      console.error(
-        "Firestore 'db' is niet gedefinieerd. Check je Firebase init."
-      );
-      return;
-    }
-
     setSeedStatus("Bezig met seeden...");
 
     const ops = [];
-
     for (const [companyId, data] of Object.entries(companiesSeed)) {
       const company = data.company;
       const certs = data.certificates || {};
@@ -838,9 +693,7 @@ window.seedCompaniesAndCertificates = async function () {
       ops.push(companyRef.set(company, { merge: true }));
 
       for (const [certId, certData] of Object.entries(certs)) {
-        const certRef = companyRef
-          .collection("certificates")
-          .doc(certId);
+        const certRef = companyRef.collection("certificates").doc(certId);
         ops.push(certRef.set(certData, { merge: true }));
       }
     }
