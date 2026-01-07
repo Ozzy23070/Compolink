@@ -850,18 +850,4 @@ document.addEventListener("DOMContentLoaded", () => {
   renderGroupList();
   syncCartToUI();
 
-  // hamburger menu
-  const burger = document.getElementById("hamburgerBtn");
-  const nav = document.getElementById("primaryNav");
-
-  if (!burger || !nav) {
-    console.warn("Hamburger/nav niet gevonden:", { burger, nav });
-    return;
-  }
-
-  burger.addEventListener("click", (e) => {
-    e.preventDefault();
-    const isOpen = nav.classList.toggle("active");
-    burger.setAttribute("aria-expanded", String(isOpen));
-  });
-});
+ 
