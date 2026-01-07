@@ -31,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const pages = document.querySelectorAll(".page");
   const internalPageButtons = document.querySelectorAll("[data-page]");
 
+  // Hamburger
+  const burger = document.getElementById("hamburgerBtn");
+  const primaryNav = document.getElementById("primaryNav");
+
   // Cart
   const cartItemsEl = document.getElementById("cart-items");
   const cartEmptyMsgEl = document.getElementById("cart-empty-msg");
@@ -71,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const jpBasePriceInput = document.getElementById("jp-base-price");
   const jpAmountInput = document.getElementById("jp-amount");
 
-  if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+  if (yearSpan) yearSpan.textContent = String(new Date().getFullYear());
 
   // ====================================
   // STATE
@@ -81,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const cart = [];
   let stockChartInstance = null;
-
   let postsUnsubscribe = null;
 
   const GROUPS = [
@@ -145,8 +148,14 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.toggle("active", target === pageId);
     });
 
+    // mobiele nav dicht na navigeren
+    if (primaryNav && burger) {
+      primaryNav.classList.remove("active");
+      burger.setAttribute("aria-expanded", "false");
+    }
+
     if (pageId === "analytics") initAnalyticsChart();
-    if (pageId === "joint") renderJointPurchases(); // ensure visible data
+    if (pageId === "joint") renderJointPurchases();
   }
 
   // ====================================
@@ -169,6 +178,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
+
+  // ====================================
+  // HAMBURGER (MOBIEL MENU)
+  // ====================================
+  if (burger && primaryNav) {
+    burger.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isOpen = primaryNav.classList.toggle("active");
+      burger.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    primaryNav.addEventListener("click", (e) => {
+      const btn = e.target.closest(".nav-btn");
+      if (!btn) return;
+      primaryNav.classList.remove("active");
+      burger.setAttribute("aria-expanded", "false");
+    });
+  }
 
   // ====================================
   // AUTH: tabs
@@ -247,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         await auth.signInWithEmailAndPassword(email, password);
+        // onAuthStateChanged handelt UI-switch af
       } catch (err) {
         console.error(err);
         if (loginError) loginError.textContent = parseFirebaseError(err);
@@ -261,7 +289,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Auth listener
+  // ====================================
+  // AUTH listener (DIRECT IN APP NA LOGIN)
+  // ====================================
   auth.onAuthStateChanged(async (user) => {
     currentUser = user || null;
 
@@ -281,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentUserRole = "buyer";
     try {
       const doc = await db.collection("users").doc(currentUser.uid).get();
-      if (doc.exists && doc.data().role) currentUserRole = doc.data().role;
+      if (doc.exists && doc.data()?.role) currentUserRole = doc.data().role;
     } catch (err) {
       console.warn("Kon gebruikersrol niet ophalen:", err);
     }
@@ -398,6 +428,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ====================================
   function initAnalyticsChart() {
     if (!stockChartCanvas || typeof Chart === "undefined") return;
+
+    // als canvas nog niet zichtbaar of chart al gemaakt
     if (stockChartInstance) return;
 
     const ctx = stockChartCanvas.getContext("2d");
@@ -460,8 +492,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
 
       const card = document.createElement("article");
       card.className = "post-card";
@@ -542,26 +574,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const submitBtn = postForm.querySelector("button[type='submit'], #postBtn");
       if (submitBtn) submitBtn.disabled = true;
 
-      if (!currentUser) {
-        alert("Log eerst in om een update te plaatsen.");
-        if (submitBtn) submitBtn.disabled = false;
-        return;
-      }
-
-      const text = postText.value.trim();
-      const file = postFile.files[0];
-
-      if (!text && !file) {
-        alert("Schrijf een update of voeg een bestand toe.");
-        if (submitBtn) submitBtn.disabled = false;
-        return;
-      }
-
-      let fileUrl = null;
-      let fileName = null;
-      let fileType = null;
-
       try {
+        if (!currentUser) {
+          alert("Log eerst in om een update te plaatsen.");
+          return;
+        }
+
+        const text = postText.value.trim();
+        const file = postFile.files[0];
+
+        if (!text && !file) {
+          alert("Schrijf een update of voeg een bestand toe.");
+          return;
+        }
+
+        let fileUrl = null;
+        let fileName = null;
+        let fileType = null;
+
         if (file) {
           const safeName = file.name.replace(/[^\w.\-]+/g, "_");
           const path = `community/${currentUser.uid}/${Date.now()}_${safeName}`;
@@ -591,6 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Fout bij plaatsen post:", err);
         alert("Plaatsen mislukt: " + (err.message || "onbekende fout"));
       } finally {
+        const submitBtn = postForm.querySelector("button[type='submit'], #postBtn");
         if (submitBtn) submitBtn.disabled = false;
       }
     });
@@ -610,7 +641,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (_) {}
 
-    // Default campaigns (mooie bedragen/tiers)
     jpCampaigns = [
       {
         id: "jp-001",
@@ -669,10 +699,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function calcCurrentTier(c) {
-    // Convert raised € to estimated kg using basePrice (demo assumption)
     const estKg = c.basePrice > 0 ? (c.raisedEur / c.basePrice) : 0;
-
-    // Find best tier reached
     let best = { kg: 0, price: c.basePrice };
     (c.tiers || []).forEach((t) => {
       if (estKg >= t.kg && t.kg >= best.kg) best = t;
@@ -791,7 +818,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ],
         raisedEur: 0,
         participants: 1,
-        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 21).toISOString().slice(0, 10) // +21 days
+        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 21).toISOString().slice(0, 10)
       };
 
       jpCampaigns.unshift(newCampaign);
@@ -800,7 +827,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderJointPurchases();
 
       jpCreateForm.reset();
-      // Zet defaults terug (gebruiksvriendelijk)
       if (jpTargetKgInput) jpTargetKgInput.value = "500";
       if (jpBasePriceInput) jpBasePriceInput.value = "38";
 
@@ -836,18 +862,12 @@ document.addEventListener("DOMContentLoaded", () => {
       saveJointPurchase();
       renderJointPurchases();
 
-      if (jpJoinForm) jpJoinForm.reset();
+      jpJoinForm.reset();
       if (jpJoinMsg) jpJoinMsg.textContent = `Joined. Contribution recorded: ${eur.format(amount)}.`;
     });
   }
 
-  // Render groups even before login (safe)
+  // Render groups + cart alvast (safe)
   renderGroupList();
   syncCartToUI();
 });
-document.addEventListener("DOMContentLoaded", () => {
-  // jouw bestaande init code (laat staan wat je al had)
-  renderGroupList();
-  syncCartToUI();
-
- 
